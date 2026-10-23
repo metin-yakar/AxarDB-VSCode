@@ -3,7 +3,7 @@
   "displayName": "AxarDB",
   "description": "Visual Studio Code extension for AxarDB - fast NoSQL database management, editable datagrid, JSON document view, query templates, system logs and multi-server support.",
   "version": "0.1.0",
-  "publisher": "axardb",
+  "publisher": "MetinYakar",
   "repository": {
     "type": "git",
     "url": "https://github.com/metin-yakar/AxarDB-VSCode.git"
