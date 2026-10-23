@@ -1,0 +1,189 @@
+:root {
+  --font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif);
+  --font-size: var(--vscode-font-size, 13px);
+  --font-mono: var(--vscode-editor-font-family, monospace);
+  --border-color: var(--vscode-widget-border, var(--vscode-panel-border, rgba(128, 128, 128, 0.35)));
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+  color: var(--vscode-foreground);
+  background-color: var(--vscode-editor-background);
+  user-select: none;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* Common Buttons */
+button, .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: 1px solid transparent;
+  padding: 4px 10px;
+  font-family: inherit;
+  font-size: var(--font-size);
+  cursor: pointer;
+  border-radius: 2px;
+  outline: none;
+}
+
+button:hover, .btn:hover {
+  background-color: var(--vscode-button-hoverBackground);
+}
+
+button:focus-visible, .btn:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: 1px;
+}
+
+button.secondary, .btn-secondary {
+  background-color: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+}
+
+button.secondary:hover, .btn-secondary:hover {
+  background-color: var(--vscode-button-secondaryHoverBackground);
+}
+
+button.icon-btn {
+  background: transparent;
+  color: var(--vscode-foreground);
+  padding: 3px;
+  border-radius: 3px;
+}
+
+button.icon-btn:hover {
+  background-color: var(--vscode-toolbar-hoverBackground, rgba(128, 128, 128, 0.2));
+}
+
+/* Inputs */
+input[type="text"], input[type="search"], textarea, select {
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border, transparent);
+  padding: 4px 8px;
+  font-family: inherit;
+  font-size: var(--font-size);
+  border-radius: 2px;
+  outline: none;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--vscode-focusBorder);
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 10px;
+  background-color: var(--vscode-badge-background);
+  color: var(--vscode-badge-foreground);
+}
+
+/* JSON Highlight Tokens */
+pre.highlighted-json, pre.plain-json {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+  user-select: text;
+}
+
+.j-key {
+  color: var(--vscode-symbolIcon-propertyForeground, #9cdcfe);
+  font-weight: 500;
+}
+
+.j-str {
+  color: var(--vscode-debugTokenExpression-string, #ce9178);
+}
+
+.j-num {
+  color: var(--vscode-debugTokenExpression-number, #b5cea8);
+}
+
+.j-bool {
+  color: var(--vscode-debugTokenExpression-boolean, #569cd6);
+  font-weight: 600;
+}
+
+.j-null {
+  color: var(--vscode-debugTokenExpression-name, #569cd6);
+  font-style: italic;
+}
+
+/* Splitter */
+.splitter {
+  width: 4px;
+  background-color: var(--border-color);
+  cursor: col-resize;
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.splitter:hover, .splitter.dragging {
+  background-color: var(--vscode-focusBorder);
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-widget-border, var(--border-color));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  padding: 10px 14px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-body {
+  padding: 14px;
+  overflow: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  padding: 10px 14px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

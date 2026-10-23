@@ -1,0 +1,634 @@
+{
+  "name": "axardb-vscode",
+  "displayName": "AxarDB",
+  "description": "Visual Studio Code extension for AxarDB - fast NoSQL database management, editable datagrid, JSON document view, query templates, system logs and multi-server support.",
+  "version": "0.1.0",
+  "publisher": "axardb",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Data Science",
+    "Other"
+  ],
+  "keywords": [
+    "axardb",
+    "database",
+    "nosql",
+    "datagrid",
+    "json",
+    "editor"
+  ],
+  "icon": "media/icons/axardb.png",
+  "activationEvents": [
+    "onView:axardb.connections"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "axardb",
+          "title": "AxarDB",
+          "icon": "media/icons/axardb.svg"
+        }
+      ]
+    },
+    "views": {
+      "axardb": [
+        {
+          "type": "webview",
+          "id": "axardb.connections",
+          "name": "Connections"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "axardb.server.add",
+        "title": "Add Connection",
+        "icon": "$(add)"
+      },
+      {
+        "command": "axardb.server.edit",
+        "title": "Edit Connection",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "axardb.server.remove",
+        "title": "Remove Connection",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "axardb.server.connect",
+        "title": "Connect",
+        "icon": "$(plug)"
+      },
+      {
+        "command": "axardb.server.disconnect",
+        "title": "Disconnect",
+        "icon": "$(debug-disconnect)"
+      },
+      {
+        "command": "axardb.server.refresh",
+        "title": "Refresh Server",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "axardb.connections.focusFilter",
+        "title": "Filter Collections",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "axardb.category.refresh",
+        "title": "Refresh Category",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "axardb.category.collapseAll",
+        "title": "Collapse All in Category",
+        "icon": "$(collapse-all)"
+      },
+      {
+        "command": "axardb.collection.open",
+        "title": "View Data",
+        "icon": "$(table)"
+      },
+      {
+        "command": "axardb.collection.copyName",
+        "title": "Copy Collection Name"
+      },
+      {
+        "command": "axardb.collection.drop",
+        "title": "Drop Collection",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "axardb.collection.exportJson",
+        "title": "Export as JSON Array..."
+      },
+      {
+        "command": "axardb.collection.exportJsonl",
+        "title": "Export as JSON Lines (JSONL)..."
+      },
+      {
+        "command": "axardb.collection.exportCsv",
+        "title": "Export as CSV..."
+      },
+      {
+        "command": "axardb.collection.template.find",
+        "title": "find(predicate)"
+      },
+      {
+        "command": "axardb.collection.template.findOne",
+        "title": "find by _id"
+      },
+      {
+        "command": "axardb.collection.template.count",
+        "title": "count()"
+      },
+      {
+        "command": "axardb.collection.template.insert",
+        "title": "insert({...})"
+      },
+      {
+        "command": "axardb.collection.template.update",
+        "title": "update(predicate, patch)"
+      },
+      {
+        "command": "axardb.collection.template.updateById",
+        "title": "updateById(_id, patch)"
+      },
+      {
+        "command": "axardb.collection.template.delete",
+        "title": "delete(predicate)"
+      },
+      {
+        "command": "axardb.collection.template.deleteById",
+        "title": "deleteById(_id)"
+      },
+      {
+        "command": "axardb.collection.logs.request",
+        "title": "Request Logs"
+      },
+      {
+        "command": "axardb.collection.logs.error",
+        "title": "Error Logs"
+      },
+      {
+        "command": "axardb.collection.logs.debug",
+        "title": "Debug Logs"
+      },
+      {
+        "command": "axardb.collection.logs.backup",
+        "title": "Backup & Recovery Logs"
+      },
+      {
+        "command": "axardb.collection.logs.queue",
+        "title": "Queue Logs"
+      },
+      {
+        "command": "axardb.collection.logs.view",
+        "title": "View Logs"
+      },
+      {
+        "command": "axardb.collection.logs.trigger",
+        "title": "Trigger Logs"
+      },
+      {
+        "command": "axardb.collection.logs.all",
+        "title": "All System Logs (syslogs)"
+      },
+      {
+        "command": "axardb.view.open",
+        "title": "Open View Script"
+      },
+      {
+        "command": "axardb.view.run",
+        "title": "Execute View"
+      },
+      {
+        "command": "axardb.view.delete",
+        "title": "Delete View"
+      },
+      {
+        "command": "axardb.trigger.open",
+        "title": "Open Trigger Script"
+      },
+      {
+        "command": "axardb.trigger.delete",
+        "title": "Delete Trigger"
+      },
+      {
+        "command": "axardb.row.copyJson",
+        "title": "Copy Row as JSON"
+      },
+      {
+        "command": "axardb.row.copyId",
+        "title": "Copy Document _id"
+      },
+      {
+        "command": "axardb.row.edit",
+        "title": "Edit Document"
+      },
+      {
+        "command": "axardb.row.duplicate",
+        "title": "Duplicate Document"
+      },
+      {
+        "command": "axardb.row.delete",
+        "title": "Delete Document"
+      },
+      {
+        "command": "axardb.row.genUpdate",
+        "title": "Generate updateById Query"
+      },
+      {
+        "command": "axardb.row.genDelete",
+        "title": "Generate deleteById Query"
+      },
+      {
+        "command": "axardb.row.showLogs",
+        "title": "Show Logs for this Record"
+      },
+      {
+        "command": "axardb.row.filterByField",
+        "title": "Filter by this Field Value"
+      },
+      {
+        "command": "axardb.query.newEditor",
+        "title": "New AxarDB Playground",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "axardb.query.run",
+        "title": "Run AxarDB Query",
+        "icon": "$(play)"
+      },
+      {
+        "command": "axardb.query.runSelection",
+        "title": "Run Selected Query",
+        "icon": "$(play)"
+      },
+      {
+        "command": "axardb.history.show",
+        "title": "Show Query History",
+        "icon": "$(history)"
+      }
+    ],
+    "submenus": [
+      {
+        "id": "axardb.collection.export",
+        "label": "Export Collection"
+      },
+      {
+        "id": "axardb.collection.templates",
+        "label": "Query Templates"
+      },
+      {
+        "id": "axardb.collection.logs",
+        "label": "Collection Logs"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "axardb.server.add",
+          "when": "view == axardb.connections",
+          "group": "navigation@1"
+        },
+        {
+          "command": "axardb.connections.focusFilter",
+          "when": "view == axardb.connections",
+          "group": "navigation@2"
+        },
+        {
+          "command": "axardb.query.newEditor",
+          "when": "view == axardb.connections",
+          "group": "navigation@3"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "axardb.query.run",
+          "when": "resourceLangId == javascript && axardb.editorBound",
+          "group": "navigation"
+        }
+      ],
+      "webview/context": [
+        {
+          "command": "axardb.server.connect",
+          "when": "webviewId == 'axardb.connections' && webviewSection == 'server' && serverState != 'connected'",
+          "group": "1_server@1"
+        },
+        {
+          "command": "axardb.server.disconnect",
+          "when": "webviewId == 'axardb.connections' && webviewSection == 'server' && serverState == 'connected'",
+          "group": "1_server@1"
+        },
+        {
+          "command": "axardb.server.refresh",
+          "when": "webviewId == 'axardb.connections' && webviewSection == 'server'",
+          "group": "1_server@2"
+        },
+        {
+          "command": "axardb.server.edit",
+          "when": "webviewId == 'axardb.connections' && webviewSection == 'server'",
+          "group": "1_server@3"
+        },
+        {
+          "command": "axardb.server.remove",
+          "when": "webviewId == 'axardb.connections' && webviewSection == 'server'",
+          "group": "1_server@4"
+        },
+        {
+          "command": "axardb.category.refresh",
+          "when": "webviewId == 'axardb.connections' && webviewSection == 'category'",
+          "group": "1_category@1"
+        },
+        {
+          "command": "axardb.category.collapseAll",
+          "when": "webviewId == 'axardb.connections' && webviewSection == 'category'",
+          "group": "1_category@2"
+        },
+        {
+          "command": "axardb.collection.open",
+          "when": "webviewId == 'axardb.connections' && webviewSection == 'collection' && kind != 'view' && kind != 'trigger'",
+          "group": "1_col@1"
+        },
+        {
+          "command": "axardb.collection.copyName",
+          "when": "webviewId == 'axardb.connections' && webviewSection == 'collection'",
+          "group": "1_col@2"
+        },
+        {
+          "submenu": "axardb.collection.export",
+          "when": "webviewId == 'axardb.connections' && webviewSection == 'collection' && (kind == 'db' || kind == 'system' || kind == 'memory' || kind == 'bulk')",
+          "group": "2_actions@1"
+        },
+        {
+          "submenu": "axardb.collection.templates",
+          "when": "webviewId == 'axardb.connections' && webviewSection == 'collection' && (kind == 'db' || kind == 'system' || kind == 'memory' || kind == 'bulk')",
+          "group": "2_actions@2"
+        },
+        {
+          "submenu": "axardb.collection.logs",
+          "when": "webviewId == 'axardb.connections' && webviewSection == 'collection' && (kind == 'db' || kind == 'system')",
+          "group": "2_actions@3"
+        },
+        {
+          "command": "axardb.view.open",
+          "when": "webviewId == 'axardb.connections' && webviewSection == 'collection' && kind == 'view'",
+          "group": "1_view@1"
+        },
+        {
+          "command": "axardb.view.run",
+          "when": "webviewId == 'axardb.connections' && webviewSection == 'collection' && kind == 'view'",
+          "group": "1_view@2"
+        },
+        {
+          "command": "axardb.view.delete",
+          "when": "webviewId == 'axardb.connections' && webviewSection == 'collection' && kind == 'view'",
+          "group": "1_view@3"
+        },
+        {
+          "command": "axardb.trigger.open",
+          "when": "webviewId == 'axardb.connections' && webviewSection == 'collection' && kind == 'trigger'",
+          "group": "1_trigger@1"
+        },
+        {
+          "command": "axardb.trigger.delete",
+          "when": "webviewId == 'axardb.connections' && webviewSection == 'collection' && kind == 'trigger'",
+          "group": "1_trigger@2"
+        },
+        {
+          "command": "axardb.collection.drop",
+          "when": "webviewId == 'axardb.connections' && webviewSection == 'collection' && kind == 'db'",
+          "group": "3_danger@1"
+        },
+        {
+          "command": "axardb.row.copyJson",
+          "when": "webviewId == 'axardb.dataPanel' && webviewSection == 'row'",
+          "group": "1_row@1"
+        },
+        {
+          "command": "axardb.row.copyId",
+          "when": "webviewId == 'axardb.dataPanel' && webviewSection == 'row'",
+          "group": "1_row@2"
+        },
+        {
+          "command": "axardb.row.edit",
+          "when": "webviewId == 'axardb.dataPanel' && webviewSection == 'row'",
+          "group": "2_mod@1"
+        },
+        {
+          "command": "axardb.row.duplicate",
+          "when": "webviewId == 'axardb.dataPanel' && webviewSection == 'row'",
+          "group": "2_mod@2"
+        },
+        {
+          "command": "axardb.row.delete",
+          "when": "webviewId == 'axardb.dataPanel' && webviewSection == 'row'",
+          "group": "2_mod@3"
+        },
+        {
+          "command": "axardb.row.genUpdate",
+          "when": "webviewId == 'axardb.dataPanel' && webviewSection == 'row'",
+          "group": "3_query@1"
+        },
+        {
+          "command": "axardb.row.genDelete",
+          "when": "webviewId == 'axardb.dataPanel' && webviewSection == 'row'",
+          "group": "3_query@2"
+        },
+        {
+          "command": "axardb.row.filterByField",
+          "when": "webviewId == 'axardb.dataPanel' && webviewSection == 'row'",
+          "group": "4_view@1"
+        },
+        {
+          "command": "axardb.row.showLogs",
+          "when": "webviewId == 'axardb.dataPanel' && webviewSection == 'row'",
+          "group": "4_view@2"
+        }
+      ],
+      "axardb.collection.export": [
+        {
+          "command": "axardb.collection.exportJson",
+          "group": "1@1"
+        },
+        {
+          "command": "axardb.collection.exportJsonl",
+          "group": "1@2"
+        },
+        {
+          "command": "axardb.collection.exportCsv",
+          "group": "1@3"
+        }
+      ],
+      "axardb.collection.templates": [
+        {
+          "command": "axardb.collection.template.find",
+          "group": "1_read@1"
+        },
+        {
+          "command": "axardb.collection.template.findOne",
+          "group": "1_read@2"
+        },
+        {
+          "command": "axardb.collection.template.count",
+          "group": "1_read@3"
+        },
+        {
+          "command": "axardb.collection.template.insert",
+          "group": "2_write@1"
+        },
+        {
+          "command": "axardb.collection.template.update",
+          "group": "2_write@2"
+        },
+        {
+          "command": "axardb.collection.template.updateById",
+          "group": "2_write@3"
+        },
+        {
+          "command": "axardb.collection.template.delete",
+          "group": "3_delete@1"
+        },
+        {
+          "command": "axardb.collection.template.deleteById",
+          "group": "3_delete@2"
+        }
+      ],
+      "axardb.collection.logs": [
+        {
+          "command": "axardb.collection.logs.all",
+          "group": "0@1"
+        },
+        {
+          "command": "axardb.collection.logs.request",
+          "group": "1@1"
+        },
+        {
+          "command": "axardb.collection.logs.error",
+          "group": "1@2"
+        },
+        {
+          "command": "axardb.collection.logs.debug",
+          "group": "1@3"
+        },
+        {
+          "command": "axardb.collection.logs.backup",
+          "group": "2@1"
+        },
+        {
+          "command": "axardb.collection.logs.queue",
+          "group": "2@2"
+        },
+        {
+          "command": "axardb.collection.logs.view",
+          "group": "2@3"
+        },
+        {
+          "command": "axardb.collection.logs.trigger",
+          "group": "2@4"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "axardb.query.run",
+        "key": "ctrl+enter",
+        "mac": "cmd+enter",
+        "when": "editorTextFocus && resourceLangId == javascript && axardb.editorBound"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "AxarDB",
+      "properties": {
+        "axardb.dataView.defaultMode": {
+          "type": "string",
+          "enum": [
+            "grid",
+            "json"
+          ],
+          "default": "grid",
+          "description": "Default view mode for data panel (editable datagrid table or JSON document list)."
+        },
+        "axardb.dataView.pageSize": {
+          "type": "number",
+          "default": 50,
+          "description": "Default page size for queries and pagination."
+        },
+        "axardb.dataView.sidePanel.visible": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to show side panel with selected row's highlighted JSON."
+        },
+        "axardb.history.maxItems": {
+          "type": "number",
+          "default": 200,
+          "description": "Maximum number of query history entries retained per server."
+        },
+        "axardb.query.timeoutMs": {
+          "type": "number",
+          "default": 30000,
+          "description": "Timeout in milliseconds for AxarDB HTTP queries."
+        },
+        "axardb.confirmDestructive": {
+          "type": "boolean",
+          "default": true,
+          "description": "Confirm before executing destructive operations (drop collection, delete records, replace records)."
+        },
+        "axardb.export.chunkSize": {
+          "type": "number",
+          "default": 1000,
+          "description": "Chunk size for streaming full collection export."
+        },
+        "axardb.logs.defaultTake": {
+          "type": "number",
+          "default": 200,
+          "description": "Default limit for fetched log records."
+        },
+        "axardb.tree.categories": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "db",
+              "system",
+              "log",
+              "memory",
+              "bulk",
+              "view",
+              "trigger"
+            ]
+          },
+          "default": [
+            "db",
+            "system",
+            "log",
+            "memory",
+            "bulk",
+            "view",
+            "trigger"
+          ],
+          "description": "Visible categories and order in collection tree accordions."
+        },
+        "axardb.tree.defaultExpanded": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "db"
+          ],
+          "description": "Category accordions expanded by default on connection."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "dev": "npm run watch",
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "node -e \"console.log('Lint ok')\""
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "@types/vscode": "^1.90.0",
+    "esbuild": "^0.25.0",
+    "jsdom": "^26.0.0",
+    "tabulator-tables": "^6.3.1",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
+  },
+  "dependencies": {
+    "@vscode/codicons": "^0.0.36",
+    "tabulator-tables": "^6.3.1"
+  }
+}

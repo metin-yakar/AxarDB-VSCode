@@ -1,0 +1,110 @@
+/* Tabulator / Custom DataGrid Styling with VS Code CSS Variables */
+
+.grid-wrapper {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  position: relative;
+  background-color: var(--vscode-editor-background);
+}
+
+.axardb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-family);
+  font-size: 12px;
+  table-layout: fixed;
+}
+
+.axardb-table th {
+  position: sticky;
+  top: 0;
+  background-color: var(--vscode-editorGroupHeader-tabsBackground, var(--vscode-sideBar-background, #252526));
+  color: var(--vscode-foreground);
+  font-weight: 600;
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+  z-index: 10;
+}
+
+.axardb-table th.sortable {
+  cursor: pointer;
+}
+
+.axardb-table th.sortable:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.axardb-table th._id-col,
+.axardb-table td._id-col {
+  width: 180px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+
+.axardb-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+.axardb-table tr {
+  cursor: pointer;
+}
+
+.axardb-table tr:hover {
+  background-color: var(--vscode-list-hoverBackground, rgba(128, 128, 128, 0.15));
+}
+
+.axardb-table tr.selected {
+  background-color: var(--vscode-list-activeSelectionBackground, #04395e);
+  color: var(--vscode-list-activeSelectionForeground, #ffffff);
+}
+
+.axardb-table tr.selected td {
+  color: inherit;
+}
+
+/* Cell editing states */
+.cell-editing {
+  padding: 0 !important;
+}
+
+.cell-editing input {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 4px 8px;
+  border: 1px solid var(--vscode-focusBorder);
+  outline: none;
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.cell-pending {
+  background-color: var(--vscode-editorWarning-background, rgba(204, 167, 0, 0.2)) !important;
+  font-style: italic;
+}
+
+/* Empty or Loading inside grid */
+.grid-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--vscode-descriptionForeground);
+  font-size: 13px;
+}

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AxarDB Connections Webview Harness</title>
+  <link rel="stylesheet" href="../../webview-src/shared/theme.css">
+  <link rel="stylesheet" href="../../webview-src/connections/tree.css">
+  <style>
+    body {
+      background-color: #1e1e1e;
+      color: #cccccc;
+      --vscode-editor-background: #1e1e1e;
+      --vscode-foreground: #cccccc;
+      --vscode-input-background: #3c3c3c;
+      --vscode-input-foreground: #cccccc;
+      --vscode-input-border: #3c3c3c;
+      --vscode-focusBorder: #007fd4;
+      --vscode-button-background: #0e639c;
+      --vscode-button-foreground: #ffffff;
+      --vscode-button-hoverBackground: #1177bb;
+      --vscode-badge-background: #4d4d4d;
+      --vscode-badge-foreground: #ffffff;
+      --vscode-list-hoverBackground: #2a2d2e;
+      --vscode-list-activeSelectionBackground: #04395e;
+      --vscode-list-activeSelectionForeground: #ffffff;
+      --vscode-charts-green: #4ec9b0;
+      --vscode-charts-yellow: #cca700;
+      --vscode-charts-red: #f14c4c;
+      --vscode-descriptionForeground: #888888;
+      width: 320px;
+      height: 600px;
+      border: 1px solid #333;
+    }
+  </style>
+  <script>
+    window.__sent = [];
+    window.__state = {};
+    window.acquireVsCodeApi = function() {
+      return {
+        postMessage: function(msg) {
+          window.__sent.push(msg);
+          console.log('[Harness Sent]', msg);
+          if (msg.type === 'ready') {
+            setTimeout(function() {
+              window.__postFixture();
+            }, 10);
+          }
+        },
+        getState: function() { return window.__state; },
+        setState: function(st) { window.__state = st; }
+      };
+    };
+
+    window.__postFixture = function() {
+      var msg = {
+        type: 'state',
+        visibleCategories: ['db', 'system', 'log', 'memory', 'bulk', 'view', 'trigger'],
+        filter: '',
+        servers: [
+          {
+            id: 's1',
+            name: 'Local AxarDB',
+            url: 'http://localhost:5000',
+            username: 'unlocker',
+            state: 'connected',
+            categories: [
+              { kind: 'db', label: 'DB', items: [ { name: 'users', count: 120 }, { name: 'orders', count: 450 } ] },
+              { kind: 'system', label: 'SYS', items: [ { name: 'sysusers' }, { name: 'sysconfig' } ] },
+              { kind: 'log', label: 'LOG', items: [ { name: 'syslogs' } ] },
+              { kind: 'memory', label: 'MEMORY', items: [ { name: 'sessionCache', count: 15 } ] },
+              { kind: 'bulk', label: 'BULK', items: [ { name: 'archive_2025', count: 10000 } ] },
+              { kind: 'view', label: 'VIEW', items: [ { name: 'activeUsers' } ] },
+              { kind: 'trigger', label: 'TRIGGER', items: [ { name: 'onOrderCreate' } ] }
+            ]
+          }
+        ]
+      };
+      window.postMessage(msg, '*');
+    };
+  </script>
+</head>
+<body>
+  <div id="app" class="tree-container">
+    <div class="filter-bar">
+      <div class="filter-input-wrapper">
+        <span class="filter-icon">🔍</span>
+        <input type="text" id="filter-input" placeholder="Filter collections..." spellcheck="false" autocomplete="off" />
+        <button id="filter-clear" class="icon-btn filter-clear-btn" title="Clear filter (Esc)">✕</button>
+      </div>
+    </div>
+    <div id="tree-root" class="tree-content" role="tree" tabindex="0"></div>
+    <div id="empty-state" class="empty-state" style="display: none;">
+      <p>No AxarDB servers configured.</p>
+      <button id="add-server-btn" class="btn">Add Server</button>
+    </div>
+  </div>
+  <script src="../../dist/webview/connections.js"></script>
+</body>
+</html>

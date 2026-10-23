@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Stacked database cylinders with high-tech badge -->
+  <ellipse cx="12" cy="5" rx="8" ry="3"/>
+  <path d="M4 5v5c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/>
+  <path d="M4 10v5c0 1.66 3.58 3 8 3s8-1.34 8-3v-5"/>
+  <path d="M4 15v4c0 1.66 3.58 3 8 3s8-1.34 8-3v-4"/>
+  <circle cx="17" cy="17" r="2.5" fill="currentColor"/>
+</svg>

@@ -1,0 +1,16 @@
+.vscode/**
+.vscode-test/**
+src/**
+webview-src/**
+test/**
+.agents/**
+AGENTS.md
+HANDOFF.md
+plan.md
+node_modules/**
+*.map
+esbuild.mjs
+tsconfig.json
+vitest.config.ts
+.gitignore
+
