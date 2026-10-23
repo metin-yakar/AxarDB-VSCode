@@ -10,6 +10,7 @@ import { showToast } from '../shared/toast.js';
 import { openInsertDialog, openExportDialog, openHistoryDialog } from './dialogs.js';
 import { onHostMessage, postMessageToHost } from '../shared/vscodeApi.js';
 import { HostToPanel, PanelToHost } from '../../src/contracts/messages.js';
+import { Doc } from '../../src/contracts/types.js';
 
 // DOM Elements
 const toolbarContainer = document.getElementById('toolbar-container') as HTMLElement;
@@ -108,29 +109,52 @@ onHostMessage<HostToPanel>((msg) => {
         total: msg.result.total,
         skip: msg.result.skip,
         elapsedMs: msg.result.elapsedMs,
+        queryScript: msg.result.script || store.getState().queryScript,
         loading: false,
         error: null,
       });
       break;
 
-    case 'queryResult':
-      if (msg.result.ok && msg.result.docs) {
+    case 'queryResult': {
+      let docs: Doc[] = [];
+      if (msg.result.docs && Array.isArray(msg.result.docs)) {
+        docs = msg.result.docs;
+      } else if (Array.isArray(msg.result.data)) {
+        docs = msg.result.data.map((item, idx) =>
+          typeof item === 'object' && item !== null ? (item as Doc) : { _id: String(idx), value: item }
+        );
+      } else if (msg.result.data !== null && msg.result.data !== undefined) {
+        if (typeof msg.result.data === 'object') {
+          docs = [msg.result.data as Doc];
+        } else {
+          docs = [{ _id: 'result', value: msg.result.data }];
+        }
+      }
+
+      if (msg.result.ok) {
         store.update({
-          docs: msg.result.docs,
-          total: msg.result.docs.length,
+          docs,
+          total: docs.length,
           skip: 0,
           elapsedMs: msg.result.elapsedMs,
+          queryScript: msg.result.script || store.getState().queryScript,
           loading: false,
           error: null,
         });
-      } else if (!msg.result.ok && msg.result.error) {
+        showToast(`Query completed: ${docs.length} row(s) (${msg.result.elapsedMs}ms)`, 'info');
+      } else {
+        const errorMsg =
+          msg.result.error?.detail ||
+          msg.result.error?.message ||
+          'Query execution failed';
         store.update({
           loading: false,
-          error: msg.result.error.detail || msg.result.error.message,
+          error: errorMsg,
         });
-        showToast(msg.result.error.message, 'error');
+        showToast(errorMsg, 'error');
       }
       break;
+    }
 
     case 'history':
       openHistoryDialog(msg.entries);

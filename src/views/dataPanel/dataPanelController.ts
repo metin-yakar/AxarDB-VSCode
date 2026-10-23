@@ -167,6 +167,13 @@ export class DataPanelController implements vscode.Disposable {
       }
 
       this._rowCache = queryRes.docs || [];
+      let displayScript = script;
+      if (params) {
+        for (const [key, val] of Object.entries(params)) {
+          displayScript = displayScript.split(`@${key}`).join(String(val));
+        }
+      }
+
       const total = typeof countRes.data === 'number' ? countRes.data : this._rowCache.length;
 
       this.postMessage({
@@ -177,7 +184,7 @@ export class DataPanelController implements vscode.Disposable {
           skip: req.skip,
           take: req.take,
           elapsedMs: queryRes.elapsedMs,
-          script,
+          script: displayScript,
         },
       });
     } catch (err: unknown) {
@@ -195,24 +202,42 @@ export class DataPanelController implements vscode.Disposable {
         script,
       });
 
-      if (res.ok && res.docs) {
-        this._rowCache = res.docs;
+      if (res.ok) {
+        if (res.docs) {
+          this._rowCache = res.docs;
+        } else if (Array.isArray(res.data)) {
+          this._rowCache = res.data.map((item, idx) =>
+            typeof item === 'object' && item !== null ? (item as Doc) : { _id: String(idx), value: item }
+          );
+        } else if (res.data !== null && res.data !== undefined) {
+          if (typeof res.data === 'object') {
+            this._rowCache = [res.data as Doc];
+          } else {
+            this._rowCache = [{ _id: 'result', value: res.data }];
+          }
+        } else {
+          this._rowCache = [];
+        }
       }
 
-      await this.historyStore.add({
-        serverId: this.options.serverId,
-        collection: this.options.collection,
-        script,
-        executedAt: res.executedAt,
-        elapsedMs: res.elapsedMs,
-        ok: res.ok,
-        rowCount: res.docs ? res.docs.length : undefined,
-      });
+      await this.historyStore
+        .add({
+          serverId: this.options.serverId,
+          collection: this.options.collection,
+          script,
+          executedAt: res.executedAt,
+          elapsedMs: res.elapsedMs,
+          ok: res.ok,
+          rowCount: this._rowCache ? this._rowCache.length : undefined,
+        })
+        .catch((err) => Logger.error('Failed to add query to history', err));
 
       this.postMessage({ type: 'queryResult', result: res });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       this.postMessage({ type: 'error', message: msg });
+    } finally {
+      this.postMessage({ type: 'loading', on: false });
     }
   }
 
