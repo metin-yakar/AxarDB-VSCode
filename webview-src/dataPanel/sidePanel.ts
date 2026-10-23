@@ -3,6 +3,7 @@ import { highlightJson } from '../shared/jsonHighlight.js';
 import { store } from './store.js';
 import { postMessageToHost } from '../shared/vscodeApi.js';
 import { PanelToHost } from '../../src/contracts/messages.js';
+import { createComplexFieldEditor } from './recordTreeEditor.js';
 
 export class SidePanel {
   private container: HTMLElement;
@@ -211,19 +212,9 @@ export class SidePanel {
         fieldRow.appendChild(input);
         inputMap.set(key, () => (input.value === '' ? null : Number(input.value)));
       } else if (typeof value === 'object' && value !== null) {
-        const textarea = document.createElement('textarea');
-        textarea.rows = Array.isArray(value) ? Math.min(6, Math.max(3, value.length + 1)) : 4;
-        textarea.style.fontFamily = 'var(--font-mono)';
-        textarea.value = JSON.stringify(value, null, 2);
-        applyControlStyle(textarea);
-        fieldRow.appendChild(textarea);
-        inputMap.set(key, () => {
-          try {
-            return JSON.parse(textarea.value);
-          } catch {
-            return textarea.value;
-          }
-        });
+        const treeEditor = createComplexFieldEditor(value, readOnly);
+        fieldRow.appendChild(treeEditor.element);
+        inputMap.set(key, treeEditor.getValue);
       } else {
         const input = document.createElement('input');
         input.type = 'text';
