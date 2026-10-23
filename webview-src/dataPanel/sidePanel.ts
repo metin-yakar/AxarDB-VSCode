@@ -162,6 +162,18 @@ export class SidePanel {
 
       fieldRow.appendChild(labelBar);
 
+      const applyControlStyle = (el: HTMLElement) => {
+        el.style.backgroundColor = 'var(--vscode-input-background, #1e1e1e)';
+        el.style.color = 'var(--vscode-input-foreground, #cccccc)';
+        el.style.border = '1px solid var(--vscode-input-border, rgba(255, 255, 255, 0.15))';
+        el.style.borderRadius = '3px';
+        el.style.padding = '5px 8px';
+        el.style.fontSize = '12px';
+        el.style.boxSizing = 'border-box';
+        el.style.width = '100%';
+        el.style.outline = 'none';
+      };
+
       // Create input based on type
       if (key === '_id' || readOnly) {
         const input = document.createElement('input');
@@ -170,10 +182,13 @@ export class SidePanel {
         input.disabled = true;
         input.style.fontFamily = 'var(--font-mono)';
         input.style.opacity = '0.75';
+        input.style.cursor = 'not-allowed';
+        applyControlStyle(input);
         fieldRow.appendChild(input);
         inputMap.set(key, () => value);
       } else if (typeof value === 'boolean') {
         const select = document.createElement('select');
+        applyControlStyle(select);
         const optTrue = document.createElement('option');
         optTrue.value = 'true';
         optTrue.textContent = 'true';
@@ -192,14 +207,15 @@ export class SidePanel {
         const input = document.createElement('input');
         input.type = 'number';
         input.value = String(value);
+        applyControlStyle(input);
         fieldRow.appendChild(input);
         inputMap.set(key, () => (input.value === '' ? null : Number(input.value)));
       } else if (typeof value === 'object' && value !== null) {
         const textarea = document.createElement('textarea');
         textarea.rows = Array.isArray(value) ? Math.min(6, Math.max(3, value.length + 1)) : 4;
         textarea.style.fontFamily = 'var(--font-mono)';
-        textarea.style.fontSize = '11px';
         textarea.value = JSON.stringify(value, null, 2);
+        applyControlStyle(textarea);
         fieldRow.appendChild(textarea);
         inputMap.set(key, () => {
           try {
@@ -212,6 +228,7 @@ export class SidePanel {
         const input = document.createElement('input');
         input.type = 'text';
         input.value = value === null || value === undefined ? '' : String(value);
+        applyControlStyle(input);
         fieldRow.appendChild(input);
         inputMap.set(key, () => (value === null && input.value === '' ? null : input.value));
       }

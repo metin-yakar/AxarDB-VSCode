@@ -67,20 +67,44 @@ button.icon-btn:hover {
   background-color: var(--vscode-toolbar-hoverBackground, rgba(128, 128, 128, 0.2));
 }
 
-/* Inputs */
-input[type="text"], input[type="search"], textarea, select {
-  background-color: var(--vscode-input-background);
-  color: var(--vscode-input-foreground);
-  border: 1px solid var(--vscode-input-border, transparent);
+/* Inputs (All types: text, number, search, password, textarea, select) */
+input,
+textarea,
+select {
+  background-color: var(--vscode-input-background, #1e1e1e);
+  color: var(--vscode-input-foreground, #cccccc);
+  border: 1px solid var(--vscode-input-border, rgba(255, 255, 255, 0.15));
   padding: 4px 8px;
   font-family: inherit;
-  font-size: var(--font-size);
+  font-size: var(--font-size, 12px);
   border-radius: 2px;
   outline: none;
+  box-sizing: border-box;
+}
+
+input[type="number"] {
+  background-color: var(--vscode-input-background, #1e1e1e);
+  color: var(--vscode-input-foreground, #cccccc);
 }
 
 input:focus, textarea:focus, select:focus {
-  border-color: var(--vscode-focusBorder);
+  border-color: var(--vscode-focusBorder, #007fd4);
+}
+
+input:disabled, textarea:disabled, select:disabled {
+  background-color: var(--vscode-input-background, #1e1e1e);
+  color: var(--vscode-disabledForeground, #888888);
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+select {
+  cursor: pointer;
+}
+
+select option {
+  background-color: var(--vscode-dropdown-background, #252526);
+  color: var(--vscode-dropdown-foreground, #cccccc);
 }
 
 /* Badges */

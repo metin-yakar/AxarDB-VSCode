@@ -17,7 +17,7 @@ export class QueryBar {
     this.container.className = 'query-bar';
     this.container.style.position = 'relative';
     this.container.style.display = 'flex';
-    this.container.style.alignItems = 'center';
+    this.container.style.alignItems = this.isScriptExpanded ? 'flex-start' : 'center';
     this.container.style.gap = '8px';
     this.container.style.padding = '6px 10px';
     this.container.style.borderBottom = '1px solid var(--border-color)';
@@ -28,17 +28,9 @@ export class QueryBar {
     filterLabel.style.fontSize = '11px';
     filterLabel.style.fontWeight = '600';
     filterLabel.style.color = 'var(--vscode-descriptionForeground)';
+    filterLabel.style.marginTop = this.isScriptExpanded ? '6px' : '0';
     filterLabel.textContent = 'Filter:';
     this.container.appendChild(filterLabel);
-
-    // Filter & Script Wrapper (occupies the main horizontal space)
-    const filterWrapper = document.createElement('div');
-    filterWrapper.id = 'query-filter-wrapper';
-    filterWrapper.style.flex = '1';
-    filterWrapper.style.position = 'relative';
-    filterWrapper.style.display = 'flex';
-    filterWrapper.style.alignItems = 'center';
-    filterWrapper.style.gap = '8px';
 
     const colName = state.collection || 'users';
     const currentScript =
@@ -47,7 +39,9 @@ export class QueryBar {
         : `db.${colName}.findall(x => true).skip(${state.skip || 0}).take(${state.pageSize || 50})`;
 
     if (!this.isScriptExpanded) {
-      // 1. Normal state: Filter text input
+      // -------------------------------------------------------------
+      // NORMAL STATE: Filter input + small compact script input beside it
+      // -------------------------------------------------------------
       const predicateInput = document.createElement('input');
       predicateInput.id = 'query-predicate-input';
       predicateInput.type = 'text';
@@ -60,104 +54,61 @@ export class QueryBar {
           this.runFilter(predicateInput.value);
         }
       };
-      filterWrapper.appendChild(predicateInput);
+      this.container.appendChild(predicateInput);
 
-      // 2. Beside it: Small compact script pill/area
-      const compactPill = document.createElement('div');
-      compactPill.id = 'query-script-pill';
-      compactPill.style.height = '26px';
-      compactPill.style.lineHeight = '24px';
-      compactPill.style.maxWidth = '300px';
-      compactPill.style.minWidth = '160px';
-      compactPill.style.padding = '0 10px';
-      compactPill.style.backgroundColor = 'var(--vscode-input-background)';
-      compactPill.style.border = '1px solid var(--vscode-input-border, var(--border-color))';
-      compactPill.style.borderRadius = '3px';
-      compactPill.style.fontFamily = 'var(--font-mono)';
-      compactPill.style.fontSize = '11px';
-      compactPill.style.whiteSpace = 'nowrap';
-      compactPill.style.overflow = 'hidden';
-      compactPill.style.textOverflow = 'ellipsis';
-      compactPill.style.cursor = 'pointer';
-      compactPill.style.color = 'var(--vscode-symbolIcon-stringForeground, #ce9178)';
-      compactPill.style.boxSizing = 'border-box';
-      compactPill.title = 'Click to expand: replaces filter horizontally and expands at least 6 rows vertically';
-      compactPill.textContent = `📜 ${currentScript}`;
-
-      compactPill.onclick = () => {
+      // Small compact script area beside the filter input
+      const scriptInput = document.createElement('input');
+      scriptInput.id = 'query-script-pill';
+      scriptInput.type = 'text';
+      scriptInput.readOnly = true;
+      scriptInput.value = currentScript;
+      scriptInput.title = 'Click to expand query textarea (replaces filter input with 6 rows)';
+      scriptInput.style.width = '240px';
+      scriptInput.style.height = '26px';
+      scriptInput.style.cursor = 'pointer';
+      scriptInput.style.fontFamily = 'var(--font-mono)';
+      scriptInput.style.fontSize = '11px';
+      scriptInput.style.color = 'var(--vscode-symbolIcon-stringForeground, #ce9178)';
+      scriptInput.onclick = () => {
         this.isScriptExpanded = true;
         this.render();
       };
+      this.container.appendChild(scriptInput);
 
-      filterWrapper.appendChild(compactPill);
-    } else {
-      // Expanded state: Textarea replaces filter text input horizontally and expands vertically at least 6 rows
-      // Dummy spacer in regular flow to preserve toolbar height
-      const spacer = document.createElement('div');
-      spacer.style.height = '26px';
-      spacer.style.width = '100%';
-      filterWrapper.appendChild(spacer);
-
-      // Absolute floating container spanning the full width of the filter input area
-      const expandedBox = document.createElement('div');
-      expandedBox.id = 'query-script-expanded';
-      expandedBox.style.position = 'absolute';
-      expandedBox.style.top = '0';
-      expandedBox.style.left = '0';
-      expandedBox.style.width = '100%';
-      expandedBox.style.boxSizing = 'border-box';
-      expandedBox.style.backgroundColor = 'var(--vscode-editor-background)';
-      expandedBox.style.border = '1px solid var(--vscode-focusBorder, #007fd4)';
-      expandedBox.style.borderRadius = '4px';
-      expandedBox.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.55)';
-      expandedBox.style.zIndex = '1000';
-      expandedBox.style.padding = '8px';
-      expandedBox.style.display = 'flex';
-      expandedBox.style.flexDirection = 'column';
-      expandedBox.style.gap = '6px';
-
-      // Header row
-      const boxHeader = document.createElement('div');
-      boxHeader.style.display = 'flex';
-      boxHeader.style.justifyContent = 'space-between';
-      boxHeader.style.alignItems = 'center';
-      boxHeader.style.fontSize = '11px';
-      boxHeader.style.fontWeight = '600';
-      boxHeader.style.color = 'var(--vscode-descriptionForeground)';
-
-      const titleSpan = document.createElement('span');
-      titleSpan.textContent = '📜 Active Query Script (Ctrl+Enter to Run)';
-      boxHeader.appendChild(titleSpan);
-
-      const closeIcon = document.createElement('button');
-      closeIcon.className = 'icon-btn';
-      closeIcon.textContent = '✕';
-      closeIcon.title = 'Collapse (Esc)';
-      closeIcon.onclick = () => {
-        this.isScriptExpanded = false;
-        this.render();
+      // Filter button
+      const runBtn = document.createElement('button');
+      runBtn.id = 'query-run-btn';
+      runBtn.textContent = 'Filter';
+      runBtn.onclick = () => {
+        this.runFilter(predicateInput.value);
       };
-      boxHeader.appendChild(closeIcon);
-      expandedBox.appendChild(boxHeader);
-
-      // Multi-line Textarea: at least 6 rows
+      this.container.appendChild(runBtn);
+    } else {
+      // -------------------------------------------------------------
+      // EXPANDED STATE: The textarea itself replaces the filter input!
+      // Enine (horizontally): flex: 1 (occupies the exact filter input width)
+      // Dikeyde (vertically): at least 6 rows (rows="6", min-height: 120px)
+      // No popup window, no modal header, no floating dialog chrome.
+      // -------------------------------------------------------------
       const textarea = document.createElement('textarea');
       textarea.id = 'query-script-textarea';
       textarea.rows = 6;
-      textarea.style.width = '100%';
-      textarea.style.minHeight = '140px';
-      textarea.style.boxSizing = 'border-box';
+      textarea.value = currentScript;
+      textarea.style.flex = '1';
+      textarea.style.minHeight = '120px';
       textarea.style.fontFamily = 'var(--font-mono)';
       textarea.style.fontSize = '12px';
       textarea.style.lineHeight = '1.45';
-      textarea.style.padding = '8px';
-      textarea.style.backgroundColor = 'var(--vscode-input-background)';
-      textarea.style.color = 'var(--vscode-input-foreground)';
-      textarea.style.border = '1px solid var(--vscode-input-border, var(--border-color))';
+      textarea.style.padding = '6px 8px';
+      textarea.style.backgroundColor = 'var(--vscode-input-background, #1e1e1e)';
+      textarea.style.color = 'var(--vscode-input-foreground, #cccccc)';
+      textarea.style.border = '1px solid var(--vscode-focusBorder, #007fd4)';
       textarea.style.borderRadius = '3px';
       textarea.style.resize = 'vertical';
-      textarea.value = currentScript;
+      textarea.style.boxSizing = 'border-box';
+      textarea.style.outline = 'none';
 
+      // Keydown handling: Ctrl+Enter to run, Escape to collapse
       textarea.onkeydown = (e) => {
         if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
           e.preventDefault();
@@ -171,84 +122,46 @@ export class QueryBar {
         }
       };
 
-      // Collapse when focus leaves the expanded box
-      expandedBox.addEventListener('focusout', (e: FocusEvent) => {
-        const related = e.relatedTarget as HTMLElement | null;
-        if (!expandedBox.contains(related)) {
-          this.collapseTimeout = setTimeout(() => {
-            this.isScriptExpanded = false;
-            this.render();
-          }, 180);
-        }
+      // Blur / Focusout handling: collapses back when focus moves outside
+      textarea.addEventListener('blur', () => {
+        this.collapseTimeout = setTimeout(() => {
+          this.isScriptExpanded = false;
+          this.render();
+        }, 180);
       });
 
-      expandedBox.addEventListener('focusin', () => {
+      this.container.appendChild(textarea);
+
+      // Run button
+      const runBtn = document.createElement('button');
+      runBtn.id = 'query-run-btn';
+      runBtn.textContent = '▶ Run';
+      runBtn.title = 'Run Query (Ctrl+Enter)';
+      runBtn.style.backgroundColor = 'var(--vscode-button-background)';
+      runBtn.style.color = 'var(--vscode-button-foreground)';
+      runBtn.style.marginTop = '2px';
+
+      runBtn.addEventListener('mousedown', () => {
         if (this.collapseTimeout) {
           clearTimeout(this.collapseTimeout);
           this.collapseTimeout = null;
         }
       });
 
-      // Footer row with hint & action buttons
-      const boxFooter = document.createElement('div');
-      boxFooter.style.display = 'flex';
-      boxFooter.style.justifyContent = 'space-between';
-      boxFooter.style.alignItems = 'center';
-      boxFooter.style.gap = '8px';
-
-      const hint = document.createElement('span');
-      hint.style.fontSize = '11px';
-      hint.style.color = 'var(--vscode-descriptionForeground)';
-      hint.textContent = 'Executes directly on AxarDB server';
-      boxFooter.appendChild(hint);
-
-      const btnGroup = document.createElement('div');
-      btnGroup.style.display = 'flex';
-      btnGroup.style.gap = '6px';
-
-      const cancelBtn = document.createElement('button');
-      cancelBtn.textContent = 'Cancel';
-      cancelBtn.onclick = () => {
-        this.isScriptExpanded = false;
-        this.render();
-      };
-      btnGroup.appendChild(cancelBtn);
-
-      const runScriptBtn = document.createElement('button');
-      runScriptBtn.textContent = '▶ Run Script';
-      runScriptBtn.style.backgroundColor = 'var(--vscode-button-background)';
-      runScriptBtn.style.color = 'var(--vscode-button-foreground)';
-      runScriptBtn.onclick = () => {
+      runBtn.onclick = () => {
         this.runAdvanced(textarea.value);
         this.isScriptExpanded = false;
         this.render();
       };
-      btnGroup.appendChild(runScriptBtn);
 
-      boxFooter.appendChild(btnGroup);
+      this.container.appendChild(runBtn);
 
-      expandedBox.appendChild(textarea);
-      expandedBox.appendChild(boxFooter);
-      filterWrapper.appendChild(expandedBox);
-
-      // Auto-focus immediately
+      // Focus the textarea immediately
       setTimeout(() => {
         textarea.focus();
         textarea.select();
       }, 30);
     }
-
-    this.container.appendChild(filterWrapper);
-
-    // Run Filter Button
-    const runBtn = document.createElement('button');
-    runBtn.id = 'query-run-btn';
-    runBtn.textContent = 'Filter';
-    runBtn.onclick = () => {
-      const inp = document.getElementById('query-predicate-input') as HTMLInputElement;
-      this.runFilter(inp ? inp.value : '');
-    };
-    this.container.appendChild(runBtn);
   }
 
   private runFilter(predicate: string): void {
