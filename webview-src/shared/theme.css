@@ -154,6 +154,143 @@ pre.highlighted-json, pre.plain-json {
   font-style: italic;
 }
 
+/* AxarDB Query Syntax Tokens */
+.ax-root {
+  color: var(--vscode-symbolIcon-namespaceForeground, #4ec9b0);
+  font-weight: 600;
+}
+
+.ax-col {
+  color: var(--vscode-symbolIcon-classForeground, #4ec9b0);
+}
+
+.ax-method {
+  color: var(--vscode-symbolIcon-methodForeground, #dcdcaa);
+}
+
+.ax-kw {
+  color: var(--vscode-symbolIcon-keywordForeground, #569cd6);
+}
+
+.ax-op {
+  color: var(--vscode-symbolIcon-operatorForeground, #d4d4d4);
+}
+
+.ax-param {
+  color: var(--vscode-symbolIcon-variableForeground, #9cdcfe);
+}
+
+.ax-field {
+  color: var(--vscode-symbolIcon-propertyForeground, #9cdcfe);
+}
+
+.ax-str {
+  color: var(--vscode-symbolIcon-stringForeground, #ce9178);
+}
+
+.ax-num {
+  color: var(--vscode-symbolIcon-numberForeground, #b5cea8);
+}
+
+.ax-param-tag {
+  color: #c586c0;
+  font-weight: 600;
+}
+
+.ax-ident {
+  color: var(--vscode-foreground, #cccccc);
+}
+
+/* Query Code Overlay Editor */
+.ax-editor-container {
+  position: relative;
+  display: flex;
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ax-highlight-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 6px 8px;
+  font-family: var(--font-mono, 'Consolas', monospace);
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-all;
+  pointer-events: none;
+  overflow: hidden;
+  box-sizing: border-box;
+  color: var(--vscode-foreground, #cccccc);
+}
+
+/* Autocomplete Suggest Widget */
+.ax-suggest-widget {
+  position: absolute;
+  z-index: 10000;
+  max-height: 200px;
+  min-width: 240px;
+  max-width: 420px;
+  overflow-y: auto;
+  background-color: var(--vscode-editorSuggestWidget-background, #252526);
+  border: 1px solid var(--vscode-editorSuggestWidget-border, #454545);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  border-radius: 4px;
+  font-family: var(--font-mono, 'Consolas', monospace);
+  font-size: 12px;
+}
+
+.ax-suggest-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  cursor: pointer;
+  user-select: none;
+  gap: 8px;
+}
+
+.ax-suggest-item:hover,
+.ax-suggest-item.selected {
+  background-color: var(--vscode-editorSuggestWidget-selectedBackground, #04395e);
+  color: var(--vscode-editorSuggestWidget-foreground, #ffffff);
+}
+
+.ax-suggest-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ax-suggest-icon {
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.ax-suggest-label {
+  font-weight: 500;
+}
+
+.ax-suggest-label mark {
+  background: transparent;
+  color: var(--vscode-editorSuggestWidget-highlightForeground, #2aaaff);
+  font-weight: bold;
+}
+
+.ax-suggest-detail {
+  font-size: 10px;
+  color: var(--vscode-descriptionForeground, #888888);
+  flex-shrink: 0;
+}
+
 /* Splitter */
 .splitter {
   width: 4px;

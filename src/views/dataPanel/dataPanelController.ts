@@ -85,7 +85,21 @@ export class DataPanelController implements vscode.Disposable {
 
   private async handleMessage(msg: PanelToHost): Promise<void> {
     switch (msg.type) {
-      case 'ready':
+      case 'ready': {
+        let collections: string[] = [this.options.collection];
+        try {
+          const cats = await this.client.listCategories(this.options.serverId);
+          for (const cat of cats) {
+            for (const item of cat.items) {
+              if (!collections.includes(item.name)) {
+                collections.push(item.name);
+              }
+            }
+          }
+        } catch {
+          // Fallback to active collection
+        }
+
         this.postMessage({
           type: 'init',
           serverName: this.options.serverName,
@@ -95,9 +109,11 @@ export class DataPanelController implements vscode.Disposable {
           pageSize: this._pageSize,
           readOnly: this._readOnly,
           initialScript: this.options.initialScript,
+          collections,
         });
         await this.loadPage({ skip: 0, take: this._pageSize });
         break;
+      }
 
       case 'loadPage':
         await this.loadPage(msg.req);

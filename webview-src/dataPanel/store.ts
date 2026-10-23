@@ -17,6 +17,7 @@ export interface DataPanelState {
   queryScript: string;
   elapsedMs: number;
   sidePanelVisible: boolean;
+  knownCollections: string[];
 }
 
 export type StoreListener = (state: DataPanelState) => void;
@@ -39,6 +40,7 @@ class DataPanelStore {
     queryScript: '',
     elapsedMs: 0,
     sidePanelVisible: true,
+    knownCollections: [],
   };
 
   private _listeners: Set<StoreListener> = new Set();

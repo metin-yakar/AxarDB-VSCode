@@ -64,6 +64,7 @@ export type HostToPanel =
       pageSize: number;
       readOnly: boolean;
       initialScript?: string;
+      collections?: string[];
     }
   | { type: 'page'; result: PageResult }
   | { type: 'queryResult'; result: QueryResult }

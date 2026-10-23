@@ -98,6 +98,7 @@ onHostMessage<HostToPanel>((msg) => {
         pageSize: msg.pageSize,
         readOnly: msg.readOnly,
         queryScript: msg.initialScript || '',
+        knownCollections: msg.collections || [],
         loading: false,
         error: null,
       });

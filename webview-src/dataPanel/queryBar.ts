@@ -1,17 +1,25 @@
 import { store } from './store.js';
 import { postMessageToHost } from '../shared/vscodeApi.js';
 import { PanelToHost } from '../../src/contracts/messages.js';
+import { highlightAxarQuery } from '../shared/queryHighlight.js';
+import { AutocompleteController } from './autocomplete.js';
 
 export class QueryBar {
   private container: HTMLElement;
   private isScriptExpanded = false;
   private collapseTimeout: ReturnType<typeof setTimeout> | null = null;
+  private autocompleteController: AutocompleteController | null = null;
 
   constructor(container: HTMLElement) {
     this.container = container;
   }
 
   public render(): void {
+    if (this.autocompleteController) {
+      this.autocompleteController.destroy();
+      this.autocompleteController = null;
+    }
+
     const state = store.getState();
     this.container.innerHTML = '';
     this.container.className = 'query-bar';
@@ -40,7 +48,7 @@ export class QueryBar {
 
     if (!this.isScriptExpanded) {
       // -------------------------------------------------------------
-      // NORMAL STATE: Filter input + small compact script input beside it
+      // NORMAL STATE: Filter input + syntax-highlighted compact script pill
       // -------------------------------------------------------------
       const predicateInput = document.createElement('input');
       predicateInput.id = 'query-predicate-input';
@@ -56,24 +64,37 @@ export class QueryBar {
       };
       this.container.appendChild(predicateInput);
 
-      // Small compact script area beside the filter input
-      const scriptInput = document.createElement('input');
-      scriptInput.id = 'query-script-pill';
-      scriptInput.type = 'text';
-      scriptInput.readOnly = true;
-      scriptInput.value = currentScript;
-      scriptInput.title = 'Click to expand query textarea (replaces filter input with 6 rows)';
-      scriptInput.style.width = '240px';
-      scriptInput.style.height = '26px';
-      scriptInput.style.cursor = 'pointer';
-      scriptInput.style.fontFamily = 'var(--font-mono)';
-      scriptInput.style.fontSize = '11px';
-      scriptInput.style.color = 'var(--vscode-symbolIcon-stringForeground, #ce9178)';
-      scriptInput.onclick = () => {
+      // Attach autocomplete to filter input for table columns
+      this.autocompleteController = new AutocompleteController(predicateInput, this.container, {
+        isFilterOnly: true,
+      });
+
+      // Small compact script area beside the filter input with syntax highlight
+      const scriptPill = document.createElement('div');
+      scriptPill.id = 'query-script-pill';
+      scriptPill.style.height = '26px';
+      scriptPill.style.lineHeight = '24px';
+      scriptPill.style.maxWidth = '360px';
+      scriptPill.style.minWidth = '180px';
+      scriptPill.style.padding = '0 10px';
+      scriptPill.style.backgroundColor = 'var(--vscode-input-background, #1e1e1e)';
+      scriptPill.style.border = '1px solid var(--vscode-input-border, rgba(255, 255, 255, 0.15))';
+      scriptPill.style.borderRadius = '3px';
+      scriptPill.style.fontFamily = 'var(--font-mono)';
+      scriptPill.style.fontSize = '11px';
+      scriptPill.style.whiteSpace = 'nowrap';
+      scriptPill.style.overflow = 'hidden';
+      scriptPill.style.textOverflow = 'ellipsis';
+      scriptPill.style.cursor = 'pointer';
+      scriptPill.style.boxSizing = 'border-box';
+      scriptPill.title = 'Click to expand query textarea (replaces filter input with 6 rows)';
+      scriptPill.innerHTML = highlightAxarQuery(currentScript);
+
+      scriptPill.onclick = () => {
         this.isScriptExpanded = true;
         this.render();
       };
-      this.container.appendChild(scriptInput);
+      this.container.appendChild(scriptPill);
 
       // Filter button
       const runBtn = document.createElement('button');
@@ -85,28 +106,60 @@ export class QueryBar {
       this.container.appendChild(runBtn);
     } else {
       // -------------------------------------------------------------
-      // EXPANDED STATE: The textarea itself replaces the filter input!
+      // EXPANDED STATE: The textarea replaces the filter input!
       // Enine (horizontally): flex: 1 (occupies the exact filter input width)
       // Dikeyde (vertically): at least 6 rows (rows="6", min-height: 120px)
-      // No popup window, no modal header, no floating dialog chrome.
+      // With live syntax highlighting overlay + AxarDB Autocomplete!
       // -------------------------------------------------------------
+      const editorWrapper = document.createElement('div');
+      editorWrapper.className = 'ax-editor-container';
+      editorWrapper.style.flex = '1';
+      editorWrapper.style.position = 'relative';
+      editorWrapper.style.minHeight = '120px';
+      editorWrapper.style.borderRadius = '3px';
+      editorWrapper.style.border = '1px solid var(--vscode-focusBorder, #007fd4)';
+      editorWrapper.style.backgroundColor = 'var(--vscode-input-background, #1e1e1e)';
+      editorWrapper.style.overflow = 'hidden';
+
+      // Syntax highlight backdrop layer
+      const backdrop = document.createElement('pre');
+      backdrop.className = 'ax-highlight-backdrop';
+      backdrop.innerHTML = highlightAxarQuery(currentScript);
+      editorWrapper.appendChild(backdrop);
+
+      // Transparent interactive textarea layer
       const textarea = document.createElement('textarea');
       textarea.id = 'query-script-textarea';
       textarea.rows = 6;
       textarea.value = currentScript;
-      textarea.style.flex = '1';
+      textarea.style.position = 'relative';
+      textarea.style.width = '100%';
       textarea.style.minHeight = '120px';
       textarea.style.fontFamily = 'var(--font-mono)';
       textarea.style.fontSize = '12px';
       textarea.style.lineHeight = '1.45';
       textarea.style.padding = '6px 8px';
-      textarea.style.backgroundColor = 'var(--vscode-input-background, #1e1e1e)';
-      textarea.style.color = 'var(--vscode-input-foreground, #cccccc)';
-      textarea.style.border = '1px solid var(--vscode-focusBorder, #007fd4)';
-      textarea.style.borderRadius = '3px';
+      textarea.style.backgroundColor = 'transparent';
+      textarea.style.color = 'transparent';
+      textarea.style.caretColor = 'var(--vscode-editorCursor-foreground, #ffffff)';
+      textarea.style.border = 'none';
       textarea.style.resize = 'vertical';
       textarea.style.boxSizing = 'border-box';
       textarea.style.outline = 'none';
+      textarea.style.whiteSpace = 'pre-wrap';
+      textarea.style.wordBreak = 'break-all';
+
+      const syncHighlight = () => {
+        backdrop.innerHTML = highlightAxarQuery(textarea.value) + (textarea.value.endsWith('\n') ? ' ' : '');
+        backdrop.scrollTop = textarea.scrollTop;
+        backdrop.scrollLeft = textarea.scrollLeft;
+      };
+
+      textarea.addEventListener('input', syncHighlight);
+      textarea.addEventListener('scroll', () => {
+        backdrop.scrollTop = textarea.scrollTop;
+        backdrop.scrollLeft = textarea.scrollLeft;
+      });
 
       // Keydown handling: Ctrl+Enter to run, Escape to collapse
       textarea.onkeydown = (e) => {
@@ -130,7 +183,13 @@ export class QueryBar {
         }, 180);
       });
 
-      this.container.appendChild(textarea);
+      editorWrapper.appendChild(textarea);
+      this.container.appendChild(editorWrapper);
+
+      // Attach autocomplete to expanded query textarea
+      this.autocompleteController = new AutocompleteController(textarea, this.container, {
+        onSelect: () => syncHighlight(),
+      });
 
       // Run button
       const runBtn = document.createElement('button');
@@ -160,6 +219,7 @@ export class QueryBar {
       setTimeout(() => {
         textarea.focus();
         textarea.select();
+        syncHighlight();
       }, 30);
     }
   }
