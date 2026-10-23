@@ -2,6 +2,8 @@
 
 The official Visual Studio Code extension for **AxarDB** — a high-performance, embedded document database engine with native JavaScript query capabilities.
 
+![AxarDB for VS Code Preview](./preview.png)
+
 ---
 
 ## ✨ Features
