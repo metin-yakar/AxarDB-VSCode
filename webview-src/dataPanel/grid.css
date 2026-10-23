@@ -99,6 +99,70 @@
   font-style: italic;
 }
 
+/* Column sorting indicator */
+.sort-arrow {
+  margin-left: 6px;
+  font-size: 10px;
+  color: var(--vscode-focusBorder, #007fd4);
+}
+
+/* Value Badges & Type-based Coloring */
+.cell-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.badge-bool-true {
+  background-color: rgba(78, 201, 176, 0.2);
+  color: var(--vscode-charts-green, #4ec9b0);
+  border: 1px solid rgba(78, 201, 176, 0.4);
+}
+
+.badge-bool-false {
+  background-color: rgba(241, 76, 76, 0.2);
+  color: var(--vscode-charts-red, #f14c4c);
+  border: 1px solid rgba(241, 76, 76, 0.4);
+}
+
+.badge-array {
+  background-color: rgba(197, 134, 192, 0.15);
+  color: #c586c0;
+  border: 1px solid rgba(197, 134, 192, 0.3);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.badge-obj {
+  background-color: rgba(206, 145, 120, 0.15);
+  color: #ce9178;
+  border: 1px solid rgba(206, 145, 120, 0.3);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.cell-num {
+  color: var(--vscode-debugTokenExpression-number, #b5cea8);
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+
+.cell-null {
+  color: var(--vscode-descriptionForeground, #888888);
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.cell-id {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  color: var(--vscode-symbolIcon-keyForeground, #9cdcfe);
+}
+
 /* Empty or Loading inside grid */
 .grid-placeholder {
   display: flex;
@@ -108,3 +172,4 @@
   color: var(--vscode-descriptionForeground);
   font-size: 13px;
 }
+

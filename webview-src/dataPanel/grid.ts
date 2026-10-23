@@ -6,6 +6,8 @@ import { PanelToHost } from '../../src/contracts/messages.js';
 export class DataGrid {
   private container: HTMLElement;
   private pendingEdits = new Set<string>(); // "rowIndex:field"
+  private sortField: string | null = null;
+  private sortDir: 'asc' | 'desc' = 'asc';
 
   constructor(container: HTMLElement) {
     this.container = container;
@@ -40,8 +42,27 @@ export class DataGrid {
 
     for (const col of columns) {
       const th = document.createElement('th');
-      th.textContent = col;
-      if (col === '_id') th.className = '_id-col';
+      th.className = 'sortable';
+      if (col === '_id') th.classList.add('_id-col');
+
+      const titleSpan = document.createElement('span');
+      titleSpan.textContent = col;
+      th.appendChild(titleSpan);
+
+      // Sort indicator
+      if (this.sortField === col) {
+        const arrow = document.createElement('span');
+        arrow.className = 'sort-arrow';
+        arrow.textContent = this.sortDir === 'asc' ? '▲' : '▼';
+        th.appendChild(arrow);
+      }
+
+      th.title = `Sort by ${col} (${this.sortField === col && this.sortDir === 'asc' ? 'descending' : 'ascending'})`;
+      th.onclick = (e) => {
+        e.stopPropagation();
+        this.toggleSort(col);
+      };
+
       headerRow.appendChild(th);
     }
     thead.appendChild(headerRow);
@@ -82,9 +103,15 @@ export class DataGrid {
           td.classList.add('cell-pending');
         }
 
-        const displayVal = val === null ? 'null' : val === undefined ? '' : typeof val === 'object' ? JSON.stringify(val) : String(val);
-        td.textContent = displayVal;
-        td.title = displayVal;
+        const renderedValue = this.createCellContent(val, col);
+        if (typeof renderedValue === 'string') {
+          td.textContent = renderedValue;
+        } else {
+          td.appendChild(renderedValue);
+        }
+
+        const rawStr = val === null ? 'null' : typeof val === 'object' ? JSON.stringify(val) : String(val ?? '');
+        td.title = rawStr;
 
         // Double click to edit cell (if not readOnly and not _id)
         if (!readOnly && col !== '_id') {
@@ -94,7 +121,6 @@ export class DataGrid {
           };
         }
 
-        headerRow;
         tr.appendChild(td);
       }
 
@@ -106,14 +132,84 @@ export class DataGrid {
     this.container.appendChild(table);
   }
 
+  private toggleSort(col: string): void {
+    if (this.sortField === col) {
+      if (this.sortDir === 'asc') {
+        this.sortDir = 'desc';
+      } else {
+        this.sortField = null;
+        this.sortDir = 'asc';
+      }
+    } else {
+      this.sortField = col;
+      this.sortDir = 'asc';
+    }
+
+    const state = store.getState();
+    postMessageToHost<PanelToHost>({
+      type: 'loadPage',
+      req: {
+        skip: 0,
+        take: state.pageSize,
+        sort: this.sortField ? { field: this.sortField, dir: this.sortDir } : undefined,
+      },
+    });
+  }
+
+  private createCellContent(val: unknown, col: string): HTMLElement | string {
+    if (col === '_id') {
+      const span = document.createElement('span');
+      span.className = 'cell-id';
+      span.textContent = String(val ?? '');
+      return span;
+    }
+
+    if (typeof val === 'boolean') {
+      const badge = document.createElement('span');
+      badge.className = `cell-badge badge-bool-${val}`;
+      badge.textContent = String(val);
+      return badge;
+    }
+
+    if (typeof val === 'number') {
+      const span = document.createElement('span');
+      span.className = 'cell-num';
+      span.textContent = String(val);
+      return span;
+    }
+
+    if (val === null) {
+      const span = document.createElement('span');
+      span.className = 'cell-null';
+      span.textContent = 'null';
+      return span;
+    }
+
+    if (Array.isArray(val)) {
+      const badge = document.createElement('span');
+      badge.className = 'cell-badge badge-array';
+      badge.textContent = `[${val.length} items]`;
+      return badge;
+    }
+
+    if (typeof val === 'object' && val !== null) {
+      const badge = document.createElement('span');
+      badge.className = 'cell-badge badge-obj';
+      badge.textContent = `{${Object.keys(val).length} keys}`;
+      return badge;
+    }
+
+    return String(val ?? '');
+  }
+
   private startCellEdit(td: HTMLTableCellElement, rowIndex: number, field: string, oldValue: unknown): void {
     if (td.classList.contains('cell-editing')) return;
 
     td.classList.add('cell-editing');
-    const originalText = td.textContent || '';
+    const originalContent = td.innerHTML;
     const input = document.createElement('input');
     input.type = 'text';
-    input.value = typeof oldValue === 'object' && oldValue !== null ? JSON.stringify(oldValue) : originalText === 'null' ? '' : originalText;
+    input.value = typeof oldValue === 'object' && oldValue !== null ? JSON.stringify(oldValue) : oldValue === null ? '' : String(oldValue ?? '');
 
     td.innerHTML = '';
     td.appendChild(input);
@@ -125,7 +221,7 @@ export class DataGrid {
       td.classList.remove('cell-editing');
 
       if (!commit) {
-        td.textContent = originalText;
+        td.innerHTML = originalContent;
         return;
       }
 
@@ -153,7 +249,13 @@ export class DataGrid {
         const editKey = `${rowIndex}:${field}`;
         this.pendingEdits.add(editKey);
         td.classList.add('cell-pending');
-        td.textContent = typeof parsedVal === 'object' && parsedVal !== null ? JSON.stringify(parsedVal) : String(parsedVal);
+        td.innerHTML = '';
+        const updatedContent = this.createCellContent(parsedVal, field);
+        if (typeof updatedContent === 'string') {
+          td.textContent = updatedContent;
+        } else {
+          td.appendChild(updatedContent);
+        }
 
         postMessageToHost<PanelToHost>({
           type: 'cellEdit',
@@ -163,7 +265,7 @@ export class DataGrid {
           oldValue,
         });
       } else {
-        td.textContent = originalText;
+        td.innerHTML = originalContent;
       }
     };
 
