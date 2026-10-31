@@ -133,10 +133,10 @@ export class DocumentationPanel implements vscode.Disposable {
       vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'documentationViewer.js')
     );
     const sharedCssUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, 'webview-src', 'shared', 'theme.css')
+      vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'theme.css')
     );
     const viewerCssUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, 'webview-src', 'documentation', 'viewer.css')
+      vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'viewer.css')
     );
     const nonce = getNonce();
 

@@ -183,8 +183,8 @@ export class ConnectionsViewProvider implements vscode.WebviewViewProvider {
 
   private getHtmlForWebview(webview: vscode.Webview): string {
     const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'connections.js'));
-    const sharedCssUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'webview-src', 'shared', 'theme.css'));
-    const treeCssUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'webview-src', 'connections', 'tree.css'));
+    const sharedCssUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'theme.css'));
+    const treeCssUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'tree.css'));
     const nonce = getNonce();
 
     return `<!DOCTYPE html>

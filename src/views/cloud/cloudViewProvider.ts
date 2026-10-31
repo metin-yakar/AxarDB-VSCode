@@ -344,10 +344,10 @@ export class CloudViewProvider implements vscode.Disposable {
       vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'cloud.js')
     );
     const sharedCssUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, 'webview-src', 'shared', 'theme.css')
+      vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'theme.css')
     );
     const cloudCssUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, 'webview-src', 'cloud', 'cloud.css')
+      vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'cloud.css')
     );
     const nonce = getNonce();
 

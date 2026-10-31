@@ -45,7 +45,14 @@ describe('Feature Preservation & Non-Regression Guardrails', () => {
     // 1. Activity bar uses media/icons/axardb.svg
     expect(pkg.contributes.viewsContainers.activitybar[0]?.icon).toBe('media/icons/axardb.svg');
 
-    // 2. Editor title has Run AxarDB Query button supporting untitled JS editors (editorLangId == javascript)
+    // 2. All 6 webview stylesheets exist in dist/webview for packaging
+    const distWebviewDir = path.resolve(__dirname, '../../dist/webview');
+    const requiredStyles = ['theme.css', 'tree.css', 'grid.css', 'docs.css', 'viewer.css', 'cloud.css'];
+    for (const styleFile of requiredStyles) {
+      expect(fs.existsSync(path.join(distWebviewDir, styleFile))).toBe(true);
+    }
+
+    // 3. Editor title has Run AxarDB Query button supporting untitled JS editors (editorLangId == javascript)
     const editorTitleRun = pkg.contributes.menus['editor/title']?.find(
       (m) => m.command === 'axardb.query.run'
     );

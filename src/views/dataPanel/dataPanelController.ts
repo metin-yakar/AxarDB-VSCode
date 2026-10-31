@@ -376,8 +376,8 @@ export class DataPanelController implements vscode.Disposable {
 
   private getHtmlForWebview(webview: vscode.Webview): string {
     const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'dataPanel.js'));
-    const sharedCssUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'webview-src', 'shared', 'theme.css'));
-    const gridCssUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'webview-src', 'dataPanel', 'grid.css'));
+    const sharedCssUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'theme.css'));
+    const gridCssUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'grid.css'));
     const nonce = getNonce();
 
     return `<!DOCTYPE html>

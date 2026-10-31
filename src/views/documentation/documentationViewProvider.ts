@@ -85,10 +85,10 @@ export class DocumentationViewProvider implements vscode.WebviewViewProvider {
       vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'documentation.js')
     );
     const sharedCssUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, 'webview-src', 'shared', 'theme.css')
+      vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'theme.css')
     );
     const docsCssUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, 'webview-src', 'documentation', 'docs.css')
+      vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'docs.css')
     );
     const nonce = getNonce();
 
