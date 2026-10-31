@@ -45,11 +45,25 @@ describe('Feature Preservation & Non-Regression Guardrails', () => {
     // 1. Activity bar uses media/icons/axardb.svg
     expect(pkg.contributes.viewsContainers.activitybar[0]?.icon).toBe('media/icons/axardb.svg');
 
-    // 2. All 6 webview stylesheets exist in dist/webview for packaging
+    // 2. All 6 webview stylesheets exist in webview-src and dist/webview
+    const requiredSourceStyles = [
+      'shared/theme.css',
+      'connections/tree.css',
+      'dataPanel/grid.css',
+      'documentation/docs.css',
+      'documentation/viewer.css',
+      'cloud/cloud.css',
+    ];
+    for (const styleRel of requiredSourceStyles) {
+      expect(fs.existsSync(path.resolve(__dirname, `../../webview-src/${styleRel}`))).toBe(true);
+    }
+
     const distWebviewDir = path.resolve(__dirname, '../../dist/webview');
-    const requiredStyles = ['theme.css', 'tree.css', 'grid.css', 'docs.css', 'viewer.css', 'cloud.css'];
-    for (const styleFile of requiredStyles) {
-      expect(fs.existsSync(path.join(distWebviewDir, styleFile))).toBe(true);
+    if (fs.existsSync(distWebviewDir)) {
+      const distStyles = ['theme.css', 'tree.css', 'grid.css', 'docs.css', 'viewer.css', 'cloud.css'];
+      for (const styleFile of distStyles) {
+        expect(fs.existsSync(path.join(distWebviewDir, styleFile))).toBe(true);
+      }
     }
 
     // 3. Editor title has Run AxarDB Query button supporting untitled JS editors (editorLangId == javascript)
