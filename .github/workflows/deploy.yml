@@ -1,0 +1,155 @@
+name: Auto Bump & Deploy to Marketplaces
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - '.vscodeignore'
+      - '.agents/**'
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: 'Version Bump Type'
+        required: false
+        default: 'auto'
+        type: choice
+        options:
+          - auto
+          - patch
+          - minor
+          - major
+          - none
+      pre_release:
+        description: 'Publish as Pre-Release'
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build, Bump, Package & Publish
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Run unit & integration tests
+        run: npm test
+
+      - name: Configure Git Bot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Automatically Bump Version
+        id: versioning
+        run: |
+          MANUAL_INPUT="${{ inputs.bump_type }}"
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          
+          # Check if version was already manually bumped in the push
+          MANUALLY_BUMPED=false
+          if git rev-parse HEAD~1 >/dev/null 2>&1; then
+            if git diff HEAD~1 HEAD -- package.json | grep -q '"version":'; then
+              MANUALLY_BUMPED=true
+              echo "Version was manually bumped in the commit."
+            fi
+          fi
+
+          if [ "$MANUALLY_BUMPED" = "true" ] || [ "$MANUAL_INPUT" = "none" ]; then
+            CURRENT_VER=$(node -p "require('./package.json').version")
+            echo "Using current version: $CURRENT_VER"
+            echo "version=$CURRENT_VER" >> $GITHUB_OUTPUT
+          else
+            # Determine bump type (patch, minor, major)
+            BUMP="patch"
+            if [ -n "$MANUAL_INPUT" ] && [ "$MANUAL_INPUT" != "auto" ]; then
+              BUMP="$MANUAL_INPUT"
+            elif echo "$COMMIT_MSG" | grep -qiE 'breaking|feat!:|fix!:'; then
+              BUMP="major"
+            elif echo "$COMMIT_MSG" | grep -qiE '^feat(\(.*\))?:'; then
+              BUMP="minor"
+            fi
+
+            echo "Determined bump type: $BUMP"
+            npm version $BUMP --no-git-tag-version
+            NEW_VER=$(node -p "require('./package.json').version")
+            echo "New version: $NEW_VER"
+
+            # Commit and push version bump back to repo
+            git add package.json package-lock.json
+            git commit -m "chore(release): v$NEW_VER [skip ci]"
+            git tag -a "v$NEW_VER" -m "Release v$NEW_VER"
+            git push origin HEAD:${{ github.ref_name }} --follow-tags
+
+            echo "version=$NEW_VER" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build extension
+        run: npm run build
+
+      - name: Package extension (.vsix)
+        run: npx @vscode/vsce package --no-dependencies
+
+      - name: Publish to Visual Studio Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          EXTRA_FLAGS=""
+          if [ "${{ inputs.pre_release }}" = "true" ]; then
+            EXTRA_FLAGS="--pre-release"
+          fi
+          npx @vscode/vsce publish --packagePath axardb-vscode-*.vsix --skip-duplicate $EXTRA_FLAGS
+
+      - name: Publish to Open VSX Registry
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          EXTRA_FLAGS=""
+          if [ "${{ inputs.pre_release }}" = "true" ]; then
+            EXTRA_FLAGS="--pre-release"
+          fi
+          npx ovsx publish axardb-vscode-*.vsix --skip-duplicate $EXTRA_FLAGS
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VER="${{ steps.versioning.outputs.version }}"
+          gh release create "v$VER" axardb-vscode-*.vsix \
+            --title "Release v$VER" \
+            --generate-notes || echo "Release v$VER already exists, skipping release creation."
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: axardb-vscode-vsix
+          path: axardb-vscode-*.vsix
+          retention-days: 30

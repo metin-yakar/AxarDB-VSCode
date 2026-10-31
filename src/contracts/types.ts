@@ -8,6 +8,10 @@ export interface ServerConfig {
   color?: string; // Hex color tag
   timeoutMs?: number;
   rejectUnauthorized?: boolean;
+  isCloud?: boolean;
+  subdomain?: string;
+  expiresAt?: string;
+  plan?: 'free' | 'paid';
 }
 
 export type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
@@ -118,3 +122,129 @@ export type TemplateKind =
   | 'updateById'
   | 'delete'
   | 'deleteById';
+
+// ---- Documentation ----
+export type DocCategoryId =
+  | 'getting-started'
+  | 'javascript-api'
+  | 'advanced'
+  | 'http-security'
+  | 'sdks-tools'
+  | 'reference';
+
+export type DocSearchFieldScope = 'all' | 'title' | 'code' | 'content';
+
+export interface DocTableBlock {
+  headers: string[];
+  rows: string[][];
+}
+
+export interface DocCodeExample {
+  title?: string;
+  language: 'javascript' | 'csharp' | 'python' | 'bash';
+  code: string;
+  runnable?: boolean;
+}
+
+export interface DocCallout {
+  kind: 'info' | 'warning';
+  title: string;
+  text: string;
+}
+
+export interface DocTopic {
+  id: string;
+  categoryId: DocCategoryId;
+  title: string;
+  icon: string;
+  summary: string;
+  keywords: string[];
+  paragraphs?: string[];
+  bullets?: string[];
+  tables?: DocTableBlock[];
+  codeExamples?: DocCodeExample[];
+  callouts?: DocCallout[];
+}
+
+export interface DocCategory {
+  id: DocCategoryId;
+  title: string;
+  icon: string;
+  description: string;
+  topics: DocTopic[];
+}
+
+// ---- AxarDB Cloud (https://axardb.com) ----
+export interface CloudUser {
+  id: string;
+  email: string;
+  plan: 'free' | 'paid';
+  emailVerified?: boolean;
+  balance?: number;
+}
+
+export interface CloudDatabaseStats {
+  storageMb?: number;
+  todayRequests?: number;
+  totalRequests?: number;
+  totalRequestLimit?: number;
+}
+
+export interface CloudDatabase {
+  id: string;
+  name: string;
+  subdomain: string;
+  status: 'active' | 'sleeping' | 'archived' | 'offline';
+  is_accessible?: boolean;
+  is_expired?: boolean;
+  plan: 'free' | 'paid';
+  plan_expires_at?: string | null;
+  expires_at?: string | null;
+  disk_limit_mb?: number;
+  total_requests?: number;
+  total_request_limit?: number;
+  daily_request_limit?: number;
+  created_at?: string;
+  stats?: CloudDatabaseStats;
+}
+
+export interface CloudBotChallenge {
+  challengeId: string;
+  salt: string;
+  difficulty: number;
+  timestamp: number;
+  signature: string;
+}
+
+export interface FastRegisterRequest {
+  email: string;
+  dbName: string;
+  subdomain: string;
+}
+
+export interface FastRegisterResponse {
+  success: boolean;
+  message?: string;
+  user: CloudUser;
+  token: string;
+  verificationLink?: string;
+  database: CloudDatabase;
+  apiKey: string;
+}
+
+export interface CloudProvisionedSession {
+  dbId: string;
+  dbName: string;
+  subdomain: string;
+  apiKey: string;
+  createdAt: string;
+  expiresAt: string;
+  verificationLink?: string;
+}
+
+export interface CloudState {
+  isLoggedIn: boolean;
+  user: CloudUser | null;
+  databases: CloudDatabase[];
+  lastProvisioned: CloudProvisionedSession | null;
+}

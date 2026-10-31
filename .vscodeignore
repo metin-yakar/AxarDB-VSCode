@@ -8,9 +8,13 @@ AGENTS.md
 HANDOFF.md
 plan.md
 node_modules/**
-*.map
+**/*.map
+docs/**
 esbuild.mjs
 tsconfig.json
 vitest.config.ts
 .gitignore
+.github/**
+.env*
+.axardb-context.md
 

@@ -67,6 +67,17 @@ export const Commands = {
 
   // History
   HISTORY_SHOW: 'axardb.history.show',
+
+  // Documentation
+  DOCS_FOCUS_SEARCH: 'axardb.docs.focusSearch',
+  DOCS_EXPAND_ALL: 'axardb.docs.expandAll',
+  DOCS_COLLAPSE_ALL: 'axardb.docs.collapseAll',
+
+  // AxarDB Cloud
+  CLOUD_OPEN: 'axardb.cloud.open',
+  CLOUD_REFRESH: 'axardb.cloud.refresh',
+  CLOUD_LOGOUT: 'axardb.cloud.logout',
+  CLOUD_FAST_CREATE: 'axardb.cloud.fastCreate',
 } as const;
 
 export type CommandId = (typeof Commands)[keyof typeof Commands];

@@ -55,6 +55,19 @@ export function classifyCollections(names: string[]): {
   return { db, system, log };
 }
 
+export function buildAuthHeader(creds: { username: string; password: string }): string {
+  const userLower = creds.username.trim().toLowerCase();
+  if (
+    creds.password.startsWith('axdb_') ||
+    userLower === 'bearer' ||
+    userLower === 'apikey' ||
+    (!creds.username.trim() && creds.password.trim().length > 0)
+  ) {
+    return `Bearer ${creds.password.trim()}`;
+  }
+  return 'Basic ' + Buffer.from(`${creds.username}:${creds.password}`).toString('base64');
+}
+
 export class AxarClient implements IAxarClient {
   constructor(private readonly getCredentials: CredentialsProvider) {}
 
@@ -72,7 +85,7 @@ export class AxarClient implements IAxarClient {
       req.signal.addEventListener('abort', () => controller.abort(req.signal?.reason));
     }
 
-    const authHeader = 'Basic ' + Buffer.from(`${creds.username}:${creds.password}`).toString('base64');
+    const authHeader = buildAuthHeader(creds);
     const start = performance.now();
     const executedAt = new Date().toISOString();
 
@@ -121,6 +134,16 @@ export class AxarClient implements IAxarClient {
         data = text ? JSON.parse(text) : null;
       } catch {
         data = text;
+      }
+
+      if (
+        data !== null &&
+        typeof data === 'object' &&
+        !Array.isArray(data) &&
+        (data as Record<string, unknown>).success === true &&
+        'result' in (data as Record<string, unknown>)
+      ) {
+        data = (data as Record<string, unknown>).result;
       }
 
       let docs: Doc[] | undefined;
@@ -178,7 +201,7 @@ export class AxarClient implements IAxarClient {
 
   public async ping(serverId: ServerId): Promise<{ ok: boolean; elapsedMs: number; error?: string }> {
     const creds = await this.getCredentials(serverId);
-    const authHeader = 'Basic ' + Buffer.from(`${creds.username}:${creds.password}`).toString('base64');
+    const authHeader = buildAuthHeader(creds);
     const start = performance.now();
 
     try {
@@ -192,6 +215,13 @@ export class AxarClient implements IAxarClient {
       if (res.ok) {
         return { ok: true, elapsedMs };
       }
+      if (authHeader.startsWith('Bearer ')) {
+        const qRes = await this.query({ serverId, script: 'return 1;' });
+        if (qRes.ok) {
+          return { ok: true, elapsedMs: qRes.elapsedMs };
+        }
+        return { ok: false, elapsedMs: qRes.elapsedMs, error: qRes.error?.message || `HTTP ${res.status}` };
+      }
       return { ok: false, elapsedMs, error: `HTTP ${res.status}: ${res.statusText}` };
     } catch (err) {
       const elapsedMs = Math.round(performance.now() - start);
@@ -201,7 +231,7 @@ export class AxarClient implements IAxarClient {
 
   public async dropCollection(serverId: ServerId, name: string): Promise<void> {
     const creds = await this.getCredentials(serverId);
-    const authHeader = 'Basic ' + Buffer.from(`${creds.username}:${creds.password}`).toString('base64');
+    const authHeader = buildAuthHeader(creds);
     const targetUrl = new URL(`/collections/${encodeURIComponent(name)}`, creds.url);
 
     const res = await fetch(targetUrl.toString(), {
@@ -216,16 +246,28 @@ export class AxarClient implements IAxarClient {
 
   public async listCategories(serverId: ServerId): Promise<CategoryInfo[]> {
     const creds = await this.getCredentials(serverId);
-    const authHeader = 'Basic ' + Buffer.from(`${creds.username}:${creds.password}`).toString('base64');
+    const authHeader = buildAuthHeader(creds);
 
     // Run all 5 sources concurrently
     const [collectionsRes, memoryRes, bulkRes, viewsRes, triggersRes] = await Promise.allSettled([
-      // 1. /collections (DB, SYS, LOG)
+      // 1. /collections (DB, SYS, LOG) with fallback to db.listCollections() for Bearer/Cloud gateways
       fetch(new URL('/collections', creds.url).toString(), {
         headers: { Authorization: authHeader },
       }).then(async r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return (await r.json()) as string[];
+        if (r.ok) {
+          return (await r.json()) as string[];
+        }
+        if (authHeader.startsWith('Bearer ')) {
+          const q = await this.query({
+            serverId,
+            script:
+              'if (typeof db.listCollections === "function") return db.listCollections(); return Object.keys(db).filter(k => typeof db[k] === "object" && !["saveView", "execute", "version"].includes(k));',
+          });
+          if (q.ok && Array.isArray(q.data)) {
+            return q.data as string[];
+          }
+        }
+        throw new Error(`HTTP ${r.status}`);
       }),
 
       // 2. /memory/list

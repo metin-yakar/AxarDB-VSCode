@@ -12,14 +12,26 @@ export class ConnectionsViewProvider implements vscode.WebviewViewProvider {
   private _filterText = '';
   private _serverCategories: Map<string, CategoryInfo[]> = new Map();
   private _serverErrors: Map<string, string> = new Map();
+  private _loadingServers: Set<string> = new Set();
 
   constructor(
     private readonly extensionUri: vscode.Uri,
     private readonly connectionManager: IConnectionManager,
-    private readonly clientProvider: (serverId: string) => IAxarClient | undefined
+    private readonly clientProvider: (serverId: string) => IAxarClient | undefined,
+    private readonly onCategoriesLoaded?: (serverId: string, categories: CategoryInfo[]) => void
   ) {
     this.connectionManager.onDidChange(() => {
       this.refreshState();
+      // Auto-load categories for newly connected servers so the user doesn't have to manually refresh
+      for (const s of this.connectionManager.list()) {
+        if (
+          this.connectionManager.state(s.id) === 'connected' &&
+          !this._serverCategories.has(s.id) &&
+          !this._loadingServers.has(s.id)
+        ) {
+          void this.loadCategoriesForServer(s.id);
+        }
+      }
     });
   }
 
@@ -62,6 +74,10 @@ export class ConnectionsViewProvider implements vscode.WebviewViewProvider {
         await vscode.commands.executeCommand('axardb.server.add');
         break;
 
+      case 'openCloud':
+        await vscode.commands.executeCommand('axardb.cloud.open');
+        break;
+
       case 'connect':
         try {
           await this.connectionManager.connect(msg.serverId);
@@ -80,6 +96,15 @@ export class ConnectionsViewProvider implements vscode.WebviewViewProvider {
 
       case 'refresh':
         if (msg.serverId) {
+          if (this.connectionManager.state(msg.serverId) !== 'connected') {
+            try {
+              await this.connectionManager.connect(msg.serverId);
+            } catch (err: unknown) {
+              const errMsg = err instanceof Error ? err.message : String(err);
+              vscode.window.showErrorMessage(`Failed to connect: ${errMsg}`);
+              break;
+            }
+          }
           await this.loadCategoriesForServer(msg.serverId);
         } else {
           await this.refreshAllServers();
@@ -93,6 +118,12 @@ export class ConnectionsViewProvider implements vscode.WebviewViewProvider {
           kind: msg.kind,
         });
         break;
+
+      case 'contextAction':
+        if (msg.command) {
+          await vscode.commands.executeCommand(msg.command, msg.arg);
+        }
+        break;
     }
   }
 
@@ -100,18 +131,22 @@ export class ConnectionsViewProvider implements vscode.WebviewViewProvider {
     const client = this.clientProvider(serverId);
     if (!client) return;
 
+    this._loadingServers.add(serverId);
     try {
       const categories = await client.listCategories(serverId);
       this._serverCategories.set(serverId, categories);
       this._serverErrors.delete(serverId);
+      this.onCategoriesLoaded?.(serverId, categories);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       this._serverErrors.set(serverId, msg);
+    } finally {
+      this._loadingServers.delete(serverId);
     }
     this.refreshState();
   }
 
-  private async refreshAllServers(): Promise<void> {
+  public async refreshAllServers(): Promise<void> {
     const servers = this.connectionManager.list();
     for (const s of servers) {
       if (this.connectionManager.state(s.id) === 'connected') {
@@ -162,20 +197,25 @@ export class ConnectionsViewProvider implements vscode.WebviewViewProvider {
   <link rel="stylesheet" href="${treeCssUri}">
   <title>AxarDB Connections</title>
 </head>
-<body>
-  <div id="app" class="tree-container">
+<body data-vscode-context='{"preventDefaultContextMenuItems": true}'>
+  <div id="app" class="tree-container" data-vscode-context='{"preventDefaultContextMenuItems": true}'>
     <div class="filter-bar">
       <div class="filter-input-wrapper">
         <span class="filter-icon">🔍</span>
         <input type="text" id="filter-input" placeholder="Filter collections..." spellcheck="false" autocomplete="off" />
-        <button id="filter-clear" class="icon-btn filter-clear-btn" title="Clear filter (Esc)">✕</button>
+        <button id="filter-clear" class="icon-btn filter-clear-btn" title="Clear filter (Esc)" aria-label="Clear filter">✕</button>
       </div>
+      <button id="refresh-all-btn" class="icon-btn filter-refresh-btn" title="Refresh all connected servers" aria-label="Refresh all connected servers">↻</button>
     </div>
     <div id="tree-root" class="tree-content" role="tree" tabindex="0"></div>
     <div id="empty-state" class="empty-state" style="display: none;">
       <p>No AxarDB servers configured.</p>
-      <button id="add-server-btn" class="btn">Add Server</button>
+      <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;">
+        <button id="add-server-btn" class="btn" title="Add a local or remote AxarDB server">Add Server</button>
+        <button id="cloud-server-btn" class="btn secondary" title="Use AxarDB Cloud (Create temporary DB or Sign in)">☁️ AxarDB Cloud</button>
+      </div>
     </div>
+    <div id="tree-context-menu" class="tree-context-menu" role="menu" style="display: none;"></div>
   </div>
   <script nonce="${nonce}" src="${scriptUri}"></script>
 </body>

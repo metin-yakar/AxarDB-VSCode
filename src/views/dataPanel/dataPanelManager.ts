@@ -29,6 +29,9 @@ export class DataPanelManager implements vscode.Disposable {
     const existing = this._panels.get(key);
     if (existing) {
       existing.reveal();
+      if (options.initialScript) {
+        existing.setQuery(options.initialScript, true);
+      }
       this._lastActiveController = existing;
       return existing;
     }

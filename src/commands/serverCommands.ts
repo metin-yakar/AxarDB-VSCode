@@ -103,9 +103,16 @@ export function registerServerCommands(
 
     vscode.commands.registerCommand('axardb.server.refresh', async (arg?: { serverId?: string }) => {
       if (arg?.serverId) {
+        if (connectionManager.state(arg.serverId) !== 'connected') {
+          try {
+            await connectionManager.connect(arg.serverId);
+          } catch {
+            // ignore
+          }
+        }
         await connectionsViewProvider.loadCategoriesForServer(arg.serverId);
       } else {
-        await vscode.commands.executeCommand('axardb.category.refresh');
+        await connectionsViewProvider.refreshAllServers();
       }
     })
   );

@@ -18,6 +18,7 @@ plan.md
 # Environment, secrets & credentials
 .env
 .env.*
+!.env.example
 *.local
 *.pem
 *.key
@@ -25,6 +26,9 @@ plan.md
 *.token
 *.cert
 credentials.json
+
+# AxarDB AI IDE temporary connection context (contains credentials - DO NOT COMMIT)
+.axardb-context.md
 
 # Logs
 *.log

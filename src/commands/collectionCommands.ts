@@ -174,7 +174,7 @@ export function registerCollectionCommands(
             edit.insert(activeEditor.selection.active, `\n${template}\n`);
           });
         } else {
-          await queryRunner.newEditor(resolved.serverId, resolved.collection);
+          await queryRunner.newEditor(resolved.serverId, resolved.collection, template);
         }
       })
     );
@@ -230,6 +230,76 @@ export function registerCollectionCommands(
     vscode.commands.registerCommand('axardb.category.collapseAll', () => {
       // Refreshing view collapses state
       vscode.commands.executeCommand('axardb.category.refresh');
+    }),
+
+    // View & Trigger commands
+    vscode.commands.registerCommand('axardb.view.open', async (arg?: CollectionContextArg) => {
+      const resolved = await resolveArg(arg);
+      if (!resolved) return;
+      await queryRunner.newEditor(
+        resolved.serverId,
+        resolved.collection,
+        `view.${resolved.collection} = function() {\n  // @access public\n  return db.users.findall().take(50);\n};`
+      );
+    }),
+    vscode.commands.registerCommand('axardb.view.run', async (arg?: CollectionContextArg) => {
+      const resolved = await resolveArg(arg);
+      if (!resolved) return;
+      const server = connectionManager.get(resolved.serverId);
+      const serverName = server ? server.name : resolved.serverId;
+      const panel = dataPanelManager.open({
+        serverId: resolved.serverId,
+        serverName,
+        collection: resolved.collection,
+        kind: 'view',
+        initialScript: `view.${resolved.collection}()`,
+      });
+      panel.reveal();
+    }),
+    vscode.commands.registerCommand('axardb.view.delete', async (arg?: CollectionContextArg) => {
+      const resolved = await resolveArg(arg);
+      if (!resolved) return;
+      const confirm = await vscode.window.showWarningMessage(
+        `Delete view '${resolved.collection}'?`,
+        { modal: true },
+        'Delete'
+      );
+      if (confirm === 'Delete') {
+        const client = clientProvider(resolved.serverId);
+        if (!client) return;
+        await client.query({
+          serverId: resolved.serverId,
+          script: `view.remove("${resolved.collection}")`,
+        });
+        await connectionsViewProvider.loadCategoriesForServer(resolved.serverId);
+      }
+    }),
+    vscode.commands.registerCommand('axardb.trigger.open', async (arg?: CollectionContextArg) => {
+      const resolved = await resolveArg(arg);
+      if (!resolved) return;
+      await queryRunner.newEditor(
+        resolved.serverId,
+        resolved.collection,
+        `trigger.${resolved.collection} = function(change) {\n  // @target users\n  return true;\n};`
+      );
+    }),
+    vscode.commands.registerCommand('axardb.trigger.delete', async (arg?: CollectionContextArg) => {
+      const resolved = await resolveArg(arg);
+      if (!resolved) return;
+      const confirm = await vscode.window.showWarningMessage(
+        `Delete trigger '${resolved.collection}'?`,
+        { modal: true },
+        'Delete'
+      );
+      if (confirm === 'Delete') {
+        const client = clientProvider(resolved.serverId);
+        if (!client) return;
+        await client.query({
+          serverId: resolved.serverId,
+          script: `trigger.remove("${resolved.collection}")`,
+        });
+        await connectionsViewProvider.loadCategoriesForServer(resolved.serverId);
+      }
     })
   );
 }

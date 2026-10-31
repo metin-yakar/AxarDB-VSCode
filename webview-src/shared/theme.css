@@ -201,6 +201,11 @@ pre.highlighted-json, pre.plain-json {
   color: var(--vscode-foreground, #cccccc);
 }
 
+.ax-comment {
+  color: var(--vscode-descriptionForeground, #6a9955);
+  font-style: italic;
+}
+
 /* Query Code Overlay Editor */
 .ax-editor-container {
   position: relative;

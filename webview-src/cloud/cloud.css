@@ -1,0 +1,644 @@
+.cloud-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px;
+  color: var(--vscode-foreground);
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+}
+
+/* Alerts & Loading */
+.cloud-alert {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.cloud-alert-error {
+  background: var(--vscode-inputValidation-errorBackground, rgba(255, 0, 0, 0.15));
+  border: 1px solid var(--vscode-inputValidation-errorBorder, var(--vscode-errorForeground));
+  color: var(--vscode-errorForeground);
+}
+
+.cloud-alert-info {
+  background: var(--vscode-textBlockQuote-background);
+  border-left: 3px solid var(--vscode-textLink-foreground);
+  color: var(--vscode-foreground);
+}
+
+.cloud-loading-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: var(--vscode-editorWidget-background);
+  border: 1px solid var(--vscode-widget-border, var(--vscode-panel-border));
+  font-size: 11.5px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.cloud-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--vscode-descriptionForeground);
+  border-top-color: var(--vscode-textLink-foreground);
+  border-radius: 50%;
+  animation: cloud-spin 0.8s linear infinite;
+}
+
+@keyframes cloud-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Hero Banner */
+.cloud-hero-banner {
+  padding: 10px;
+  border-radius: 5px;
+  background: var(--vscode-editorWidget-background);
+  border: 1px solid var(--vscode-widget-border, var(--vscode-panel-border));
+}
+
+.cloud-hero-title {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: var(--vscode-foreground);
+}
+
+.cloud-hero-desc {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--vscode-descriptionForeground);
+}
+
+/* Mode Tabs */
+.cloud-mode-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 5px;
+  background: var(--vscode-editorWidget-background);
+  border: 1px solid var(--vscode-widget-border, var(--vscode-panel-border));
+}
+
+.cloud-mode-tab {
+  padding: 6px 8px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--vscode-descriptionForeground);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.cloud-mode-tab:hover {
+  background: var(--vscode-list-hoverBackground);
+  color: var(--vscode-foreground);
+}
+
+.cloud-mode-tab.active {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+
+/* Forms */
+.cloud-card-form,
+.cloud-subform {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  background: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-widget-border, var(--vscode-panel-border));
+}
+
+.cloud-form-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.cloud-feature-pill {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 10.5px;
+  font-weight: 600;
+  background: var(--vscode-badge-background);
+  color: var(--vscode-badge-foreground);
+}
+
+.cloud-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cloud-form-group label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--vscode-foreground);
+}
+
+.cloud-form-group input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--vscode-input-border, var(--vscode-panel-border));
+  background: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  font-family: var(--vscode-font-family);
+  font-size: 12px;
+}
+
+.cloud-form-group input:focus {
+  outline: 1px solid var(--vscode-focusBorder);
+  border-color: var(--vscode-focusBorder);
+}
+
+.cloud-field-hint {
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--vscode-descriptionForeground);
+}
+
+.cloud-field-hint.hint-error {
+  color: var(--vscode-errorForeground);
+}
+
+.cloud-field-hint.hint-ok {
+  color: var(--vscode-testing-iconPassed, var(--vscode-textLink-foreground));
+}
+
+.cloud-url-preview {
+  padding: 4px 7px;
+  border-radius: 3px;
+  background: var(--vscode-textCodeBlock-background);
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground);
+  word-break: break-all;
+}
+
+/* BotGuard Slider */
+.cloud-bot-track {
+  position: relative;
+  height: 32px;
+  border-radius: 4px;
+  background: var(--vscode-input-background);
+  border: 1px solid var(--vscode-input-border, var(--vscode-panel-border));
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.cloud-bot-track.verified {
+  border-color: var(--vscode-testing-iconPassed, var(--vscode-textLink-foreground));
+}
+
+.cloud-bot-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--vscode-button-secondaryBackground);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.cloud-bot-text {
+  position: relative;
+  z-index: 1;
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground);
+  pointer-events: none;
+}
+
+.cloud-bot-track.verified .cloud-bot-text {
+  color: var(--vscode-foreground);
+  font-weight: 600;
+}
+
+.cloud-bot-thumb {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  bottom: 2px;
+  width: 32px;
+  border-radius: 3px;
+  border: none;
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  font-weight: 700;
+  cursor: grab;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cloud-bot-track.verified .cloud-bot-thumb {
+  left: auto;
+  right: 2px;
+  transform: none !important;
+  cursor: default;
+}
+
+/* Buttons */
+.cloud-full-btn {
+  width: 100%;
+  justify-content: center;
+  padding: 6px 10px;
+  font-weight: 600;
+}
+
+.cloud-btn-primary {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+
+.cloud-btn-primary:hover {
+  background: var(--vscode-button-hoverBackground);
+}
+
+.cloud-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--vscode-textLink-foreground);
+  font-size: 11px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.cloud-token-toggle-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.cloud-token-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--vscode-panel-border);
+}
+
+/* Account Card */
+.cloud-account-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 5px;
+  background: var(--vscode-editorWidget-background);
+  border: 1px solid var(--vscode-widget-border, var(--vscode-panel-border));
+}
+
+.cloud-account-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.cloud-account-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.cloud-account-email {
+  font-weight: 700;
+  font-size: 12.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cloud-account-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.cloud-account-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cloud-verify-badge {
+  font-size: 10.5px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--vscode-textCodeBlock-background);
+  color: var(--vscode-descriptionForeground);
+}
+
+.cloud-verify-badge.unverified {
+  border: 1px solid var(--vscode-editorWarning-foreground);
+  color: var(--vscode-editorWarning-foreground);
+}
+
+/* Provisioned Banner */
+.cloud-provisioned-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 9px 10px;
+  border-radius: 5px;
+  background: var(--vscode-textBlockQuote-background);
+  border: 1px solid var(--vscode-textLink-foreground);
+  font-size: 11.5px;
+}
+
+.cloud-prov-expire {
+  color: var(--vscode-editorWarning-foreground);
+}
+
+/* Section Header */
+.cloud-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 2px 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--vscode-descriptionForeground);
+}
+
+/* Database Cards */
+.cloud-db-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cloud-db-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 6px;
+  background: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-widget-border, var(--vscode-panel-border));
+}
+
+.cloud-db-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.cloud-db-title-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cloud-db-name {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cloud-db-badges {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.cloud-plan-badge {
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--vscode-badge-background);
+  color: var(--vscode-badge-foreground);
+}
+
+.cloud-status-badge {
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10.5px;
+  font-weight: 600;
+  border: 1px solid var(--vscode-panel-border);
+}
+
+.cloud-status-badge.status-active {
+  color: var(--vscode-testing-iconPassed, var(--vscode-textLink-foreground));
+  border-color: var(--vscode-testing-iconPassed, var(--vscode-textLink-foreground));
+}
+
+.cloud-status-badge.status-sleeping {
+  color: var(--vscode-editorWarning-foreground);
+  border-color: var(--vscode-editorWarning-foreground);
+}
+
+.cloud-status-badge.status-expired,
+.cloud-status-badge.status-offline {
+  color: var(--vscode-errorForeground);
+  border-color: var(--vscode-errorForeground);
+}
+
+.cloud-status-badge.status-archived {
+  color: var(--vscode-descriptionForeground);
+}
+
+.cloud-db-url-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 4px 7px;
+  border-radius: 4px;
+  background: var(--vscode-textCodeBlock-background);
+}
+
+.cloud-db-url {
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cloud-mini-btn {
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--vscode-button-border, var(--vscode-panel-border));
+  background: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  font-size: 10.5px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.cloud-mini-btn:hover {
+  background: var(--vscode-button-secondaryHoverBackground);
+}
+
+/* Prominent Expire Date Banner */
+.cloud-expire-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: var(--vscode-editorWidget-background);
+  border-left: 3px solid var(--vscode-textLink-foreground);
+  font-size: 11.5px;
+}
+
+.cloud-expire-banner.expire-warning {
+  border-left-color: var(--vscode-editorWarning-foreground);
+}
+
+.cloud-expire-banner.expire-expired {
+  border-left-color: var(--vscode-errorForeground);
+  background: var(--vscode-inputValidation-errorBackground, rgba(255, 0, 0, 0.1));
+}
+
+.cloud-expire-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.cloud-expire-label {
+  color: var(--vscode-descriptionForeground);
+}
+
+.cloud-expire-date {
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 11.5px;
+}
+
+.cloud-expire-pill {
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 10.5px;
+  font-weight: 600;
+  background: var(--vscode-badge-background);
+  color: var(--vscode-badge-foreground);
+}
+
+.cloud-expire-pill.expire-pill-warning {
+  background: var(--vscode-editorWarning-foreground);
+  color: var(--vscode-editor-background);
+}
+
+.cloud-expire-pill.expire-pill-expired {
+  background: var(--vscode-errorForeground);
+  color: var(--vscode-editor-background);
+}
+
+/* Site Details Grid */
+.cloud-site-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.cloud-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 5px 7px;
+  border-radius: 4px;
+  background: var(--vscode-editorWidget-background);
+}
+
+.cloud-detail-label {
+  font-size: 10px;
+  color: var(--vscode-descriptionForeground);
+  text-transform: uppercase;
+}
+
+.cloud-detail-value {
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+/* API Key Reveal Box */
+.cloud-key-reveal-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: var(--vscode-textCodeBlock-background);
+  border: 1px dashed var(--vscode-textLink-foreground);
+}
+
+.cloud-key-reveal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.cloud-key-code {
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 11px;
+  word-break: break-all;
+}
+
+/* Action Buttons */
+.cloud-db-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.cloud-db-actions .btn {
+  flex: 1 1 auto;
+  font-size: 11px;
+  padding: 5px 7px;
+  justify-content: center;
+}
+
+.cloud-empty-dbs {
+  padding: 14px 10px;
+  text-align: center;
+  border-radius: 5px;
+  background: var(--vscode-editorWidget-background);
+  font-size: 12px;
+}
+
+.cloud-muted {
+  color: var(--vscode-descriptionForeground);
+  font-size: 11px;
+}
+

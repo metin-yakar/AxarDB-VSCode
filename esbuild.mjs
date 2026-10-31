@@ -42,6 +42,39 @@ const buildConfigs = [
     target: 'es2022',
     sourcemap: true,
     logLevel: 'info',
+  },
+  // Documentation Webview (Browser)
+  {
+    entryPoints: ['webview-src/documentation/main.ts'],
+    bundle: true,
+    outfile: 'dist/webview/documentation.js',
+    format: 'iife',
+    platform: 'browser',
+    target: 'es2022',
+    sourcemap: true,
+    logLevel: 'info',
+  },
+  // Documentation Viewer Panel Webview (Browser)
+  {
+    entryPoints: ['webview-src/documentation/viewer.ts'],
+    bundle: true,
+    outfile: 'dist/webview/documentationViewer.js',
+    format: 'iife',
+    platform: 'browser',
+    target: 'es2022',
+    sourcemap: true,
+    logLevel: 'info',
+  },
+  // AxarDB Cloud Webview (Browser)
+  {
+    entryPoints: ['webview-src/cloud/main.ts'],
+    bundle: true,
+    outfile: 'dist/webview/cloud.js',
+    format: 'iife',
+    platform: 'browser',
+    target: 'es2022',
+    sourcemap: true,
+    logLevel: 'info',
   }
 ];
 

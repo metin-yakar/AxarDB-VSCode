@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AxarDB Documentation Webview Harness</title>
+  <link rel="stylesheet" href="../../webview-src/shared/theme.css">
+  <link rel="stylesheet" href="../../webview-src/documentation/docs.css">
+  <style id="theme-vars">
+    body {
+      background-color: #1e1e1e;
+      color: #cccccc;
+      --vscode-editor-background: #1e1e1e;
+      --vscode-sideBar-background: #252526;
+      --vscode-sideBar-foreground: #cccccc;
+      --vscode-sideBarSectionHeader-background: #2d2d2d;
+      --vscode-sideBarSectionHeader-foreground: #e7e7e7;
+      --vscode-foreground: #cccccc;
+      --vscode-input-background: #3c3c3c;
+      --vscode-input-foreground: #cccccc;
+      --vscode-input-border: #3c3c3c;
+      --vscode-focusBorder: #007fd4;
+      --vscode-button-background: #0e639c;
+      --vscode-button-foreground: #ffffff;
+      --vscode-button-hoverBackground: #1177bb;
+      --vscode-button-secondaryBackground: #3a3d41;
+      --vscode-button-secondaryForeground: #ffffff;
+      --vscode-button-secondaryHoverBackground: #45494e;
+      --vscode-badge-background: #4d4d4d;
+      --vscode-badge-foreground: #ffffff;
+      --vscode-list-hoverBackground: #2a2d2e;
+      --vscode-list-inactiveSelectionBackground: #37373d;
+      --vscode-list-activeSelectionBackground: #04395e;
+      --vscode-list-activeSelectionForeground: #ffffff;
+      --vscode-editorWidget-background: #252526;
+      --vscode-textCodeBlock-background: #1a1a1a;
+      --vscode-editor-findMatchHighlightBackground: rgba(234, 92, 0, 0.45);
+      --vscode-charts-green: #4ec9b0;
+      --vscode-charts-yellow: #cca700;
+      --vscode-charts-red: #f14c4c;
+      --vscode-descriptionForeground: #9d9d9d;
+      width: 360px;
+      height: 680px;
+      border: 1px solid #333;
+    }
+    body.theme-light {
+      background-color: #f3f3f3;
+      color: #333333;
+      --vscode-editor-background: #ffffff;
+      --vscode-sideBar-background: #f3f3f3;
+      --vscode-sideBar-foreground: #333333;
+      --vscode-sideBarSectionHeader-background: #e8e8e8;
+      --vscode-sideBarSectionHeader-foreground: #333333;
+      --vscode-foreground: #333333;
+      --vscode-input-background: #ffffff;
+      --vscode-input-foreground: #333333;
+      --vscode-input-border: #cecece;
+      --vscode-focusBorder: #0066b8;
+      --vscode-button-background: #007acc;
+      --vscode-button-foreground: #ffffff;
+      --vscode-button-hoverBackground: #0062a3;
+      --vscode-button-secondaryBackground: #e4e6f1;
+      --vscode-button-secondaryForeground: #333333;
+      --vscode-button-secondaryHoverBackground: #d6d8e5;
+      --vscode-badge-background: #c4c4c4;
+      --vscode-badge-foreground: #333333;
+      --vscode-list-hoverBackground: #e8e8e8;
+      --vscode-list-inactiveSelectionBackground: #e4e6f1;
+      --vscode-list-activeSelectionBackground: #0060c0;
+      --vscode-list-activeSelectionForeground: #ffffff;
+      --vscode-editorWidget-background: #f8f8f8;
+      --vscode-textCodeBlock-background: #f6f8fa;
+      --vscode-editor-findMatchHighlightBackground: rgba(234, 92, 0, 0.3);
+      --vscode-charts-green: #16825d;
+      --vscode-charts-yellow: #bf8803;
+      --vscode-charts-red: #e51400;
+      --vscode-descriptionForeground: #616161;
+      border-color: #ccc;
+    }
+  </style>
+  <script>
+    window.__sent = [];
+    window.__state = {};
+    window.__post = function(msg) {
+      window.postMessage(msg, '*');
+    };
+    window.acquireVsCodeApi = function() {
+      return {
+        postMessage: function(msg) {
+          window.__sent.push(msg);
+          console.log('[Harness Sent]', msg);
+        },
+        getState: function() { return window.__state; },
+        setState: function(st) { window.__state = st; }
+      };
+    };
+    window.addEventListener('DOMContentLoaded', function() {
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('theme') === 'light') {
+        document.body.classList.add('theme-light');
+      }
+    });
+  </script>
+</head>
+<body>
+  <div id="docs-app" class="docs-container">
+    <div class="docs-search-header">
+      <div class="docs-search-row">
+        <div class="docs-search-input-wrapper">
+          <span class="docs-search-icon" aria-hidden="true">🔍</span>
+          <input
+            type="text"
+            id="docs-global-search"
+            placeholder="General search in docs..."
+            aria-label="General search in AxarDB documentation"
+            title="Search across all categories, topics, and code examples"
+            spellcheck="false"
+            autocomplete="off"
+          />
+          <button
+            id="docs-search-clear"
+            class="icon-btn docs-clear-btn"
+            title="Clear search (Esc)"
+            aria-label="Clear search"
+          >✕</button>
+        </div>
+        <button
+          id="docs-toggle-advanced"
+          class="icon-btn docs-filter-toggle-btn"
+          title="Specific / Scoped Search Filters (Category & Target)"
+          aria-label="Toggle Specific Search Filters"
+          aria-expanded="false"
+        >⚙️</button>
+      </div>
+
+      <div id="docs-scoped-bar" class="docs-scoped-bar" hidden>
+        <div class="docs-filter-group">
+          <label for="docs-category-select" class="docs-filter-label">Category:</label>
+          <select
+            id="docs-category-select"
+            class="docs-select"
+            title="Filter by main category"
+            aria-label="Filter by main category"
+          >
+            <option value="all">All Categories (Global)</option>
+            <option value="getting-started">Getting Started</option>
+            <option value="javascript-api">JavaScript API</option>
+            <option value="advanced">Advanced</option>
+            <option value="http-security">HTTP &amp; Security</option>
+            <option value="sdks-tools">SDKs &amp; Tools</option>
+            <option value="reference">Reference</option>
+          </select>
+        </div>
+
+        <div class="docs-scope-pills" role="group" aria-label="Search target scope">
+          <button type="button" id="scope-btn-all" class="scope-pill active" data-scope="all" title="Search in titles, descriptions, tables, and code" aria-label="Search all fields">All</button>
+          <button type="button" id="scope-btn-title" class="scope-pill" data-scope="title" title="Search only in topic titles and keywords" aria-label="Search titles only">Titles</button>
+          <button type="button" id="scope-btn-code" class="scope-pill" data-scope="code" title="Search only in code examples" aria-label="Search code examples only">Code</button>
+          <button type="button" id="scope-btn-content" class="scope-pill" data-scope="content" title="Search only in descriptions and tables" aria-label="Search text and tables only">Content</button>
+        </div>
+      </div>
+
+      <div id="docs-search-summary" class="docs-search-summary" hidden></div>
+    </div>
+
+    <div id="docs-accordion-root" class="docs-accordion-root" role="tree" aria-label="AxarDB Documentation Categories"></div>
+
+    <div id="docs-empty-state" class="docs-empty-state" hidden>
+      <p>No documentation topics match your search criteria.</p>
+      <button id="docs-reset-filters-btn" class="btn secondary" title="Reset all search filters" aria-label="Reset all search filters">Reset Search</button>
+    </div>
+  </div>
+  <script src="../../dist/webview/documentation.js"></script>
+</body>
+</html>
+

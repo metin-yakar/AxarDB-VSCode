@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AxarDB Cloud Harness</title>
+  <link rel="stylesheet" href="../../webview-src/shared/theme.css" />
+  <link rel="stylesheet" href="../../webview-src/cloud/cloud.css" />
+  <style>
+    body {
+      max-width: 420px;
+      margin: 0 auto;
+      background: var(--vscode-sideBar-background, #1e1e1e);
+      color: var(--vscode-foreground, #cccccc);
+    }
+  </style>
+</head>
+<body>
+  <div id="cloud-app" class="cloud-container"></div>
+  <script>
+    window.acquireVsCodeApi = () => ({
+      postMessage: (msg) => console.log('[Harness Cloud -> Host]', msg),
+      getState: () => ({}),
+      setState: () => {},
+    });
+  </script>
+  <script src="../../dist/webview/cloud.js"></script>
+</body>
+</html>
+
